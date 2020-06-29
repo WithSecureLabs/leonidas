@@ -1,0 +1,31 @@
+---
+name: List GuardDuty Detectors
+author: Nick Jones
+description: |
+  None
+category: "Discovery"
+mitre_ids:
+  - T1063
+platform: aws
+permissions:
+  - guardduty:ListDetectors
+input_arguments:
+executors:
+  sh:
+    code: |
+      aws guardduty list-detectors
+  leonidas_aws:
+    implemented: True
+    clients:
+      - guardduty
+    code: |
+      result = clients["guardduty"].list_detectors()
+detection:
+  sigma_id: 79212574-fe46-4d50-8376-74dbcffb0f22
+  status: experimental
+  level: low
+  sources:
+    - name: "cloudtrail"
+      attributes:
+        eventName: "ListDetectors"
+        eventSource: "*.ec2.amazonaws.com"

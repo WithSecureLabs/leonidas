@@ -1,0 +1,69 @@
+---
+name: Add an existing role to a new EC2 instance
+author: Nick Jones
+description: |
+  An adversary may attach an existing role to a new EC2 instance to which they have access
+platform: aws
+category: Privilege Escalation
+mitre_ids:
+  - T1098
+permissions:
+  - iam:PassRole
+  - ec2:RunInstances
+input_arguments:
+  image_id:
+    description: AMI to create instance from
+    type: str
+    value: ami-a4dc46db
+  instance_type:
+    description: Type of instance to create
+    type: str
+    value: t2.micro
+  iam_instance_profile_name:
+    description: EC2 instance profile to assign
+    type: str
+    value: ec2-instance-profile
+  key_name:
+    description: Name of SSH key to assign to instance
+    type: str
+    value: my-ssh-key
+  security_group_id:
+    description: ID of a security group to apply to the instance
+    type: str
+    value: sg-123456
+executors:
+  sh:
+    code: |
+      aws ec2 run-instances –image-id image_id –instance-type instance_type –iam-instance-profile Name=iam_instance_profile_name –key-name key_name –security-group-ids security_group_ids
+  leonidas_aws:
+    implemented: True
+    clients:
+      - ec2
+    code: |
+      result = clients['ec2'].run_instances(
+        ImageId=image_id,
+        InstanceType=instance_type,
+        KeyName=key_name,
+        MaxCount=1,
+        MinCount=1,
+        Monitoring={
+            'Enabled': True|False
+        },
+        SecurityGroupIds=[
+            security_group_id
+        ],
+        ClientToken='str',
+        EbsOptimized=True|False,
+        IamInstanceProfile={
+            'Name': iam_instance_profile_name
+        }
+      )
+detection:
+  sigma_id: 899eb2b1-6e96-4203-bd38-9cddf970a50a
+  status: experimental
+  level: low
+  sources:
+    - name: cloudtrail
+      attributes:
+        eventName: RunInstances
+        eventSource: "ec2.amazonaws.com"

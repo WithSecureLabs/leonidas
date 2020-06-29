@@ -1,0 +1,33 @@
+version: 0.2
+
+env:
+  variables:
+    SLS_DEBUG: "*"
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 10
+      python: 3.7
+    commands:
+      - npm install --global serverless
+      - pip install poetry
+      - cd generator
+      - poetry install
+  pre_build:
+    commands:
+      - python -m unittest discover test
+      - poetry run python generator.py validate
+      - poetry run python generator.py generate-aws-api
+  build:
+    commands:
+      - cd ../output/leonidas
+      # - pylint ./api
+      - serverless plugin install --name serverless-python-requirements
+      - serverless plugin install --name serverless-wsgi
+      - poetry export --without-hashes -f requirements.txt -o requirements.txt
+      - serverless deploy --conceal
+
+artifacts:
+  files:
+    - output/**/*

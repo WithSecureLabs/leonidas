@@ -1,0 +1,42 @@
+---
+name: Add a policy to a group
+author: Nick Jones
+description: |
+  An adversary may attempt to add a policy to a group, in order to alter the permissions assigned to a user they have compromised.
+platform: aws
+category: Privilege Escalation
+mitre_ids:
+  - T1098
+permissions:
+  - iam:AttachGroupPolicy
+input_arguments:
+  group:
+    description: Group to add policy to
+    type: str
+    value: NONE
+  policyarn:
+    description: Policy to add to group
+    type: str
+    value: arn:aws:iam::aws:policy/ReadOnlyAccess
+executors:
+  sh:
+    code: |
+      aws iam attach-group-policy --group-name {{ group['value'] }} --policy-arn {{ policyarn['value'] }}
+  leonidas_aws:
+    implemented: True
+    clients:
+      - iam
+    code: |
+      result = clients["iam"].attach_group_policy(
+          GroupName=group,
+          PolicyArn=policyarn
+      )
+detection:
+  sigma_id: 299b8380-8447-4f24-8520-c7a3c0008ef8
+  status: experimental
+  level: low
+  sources:
+    - name: cloudtrail
+      attributes:
+        eventName: AttachGroupPolicy
+        eventSource: "iam.amazonaws.com"

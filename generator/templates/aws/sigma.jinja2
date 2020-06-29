@@ -1,0 +1,21 @@
+---
+title: {{ name }}
+id: {{ detection.sigma_id }}
+status: {{ detection.status }}
+author: {{ author }}
+date: {{ last_modified }}
+description: {{ description | trim }}
+logsource:
+  service: {{ detection.sources[0]["name"] }}
+detection:
+  selection_source:
+    - eventSource: "{{ detection["sources"][0]["attributes"]["eventSource"] }}"
+  events:
+    - eventName: "{{ detection["sources"][0]["attributes"]["eventName"] }}"
+  condition: selection_source AND events
+level: {{ detection["level"] }}
+{% if mitre_ids %}tags:
+  {% for id in mitre_ids %}- attack.t1089
+  {% endfor %}{% endif %}
+{% if references %}references:{% for reference in references %}
+  - {{ reference }}{% endfor %}{% endif %}

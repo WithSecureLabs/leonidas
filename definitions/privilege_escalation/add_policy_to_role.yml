@@ -1,0 +1,42 @@
+---
+name: Add a policy to a role
+author: Nick Jones
+description: |
+  An adversary may attempt to add a policy to a role, in order to grant additional privileges to a compromised resource.
+platform: aws
+category: Privilege Escalation
+mitre_ids:
+  - T1098
+permissions:
+  - iam:AttachUserPolicy
+input_arguments:
+  role:
+    description: Role to add policy to
+    type: str
+    value: ReadOnlyRole
+  policyarn:
+    description: Policy to add to Role
+    type: str
+    value: arn:aws:iam::aws:policy/ReadOnlyAccess
+executors:
+  sh:
+    code: |
+      aws iam attach-role-policy --role-name {{ role['value'] }} --policy-arn {{ policyarn['value'] }}
+  leonidas_aws:
+    implemented: True
+    clients:
+      - iam
+    code: |
+      result = clients["iam"].attach_role_policy(
+          RoleName=role,
+          PolicyArn=policyarn
+      )
+detection:
+  sigma_id: cdf3b0fc-0c45-4bb4-89f2-1c6b2661ec52
+  status: experimental
+  level: low
+  sources:
+    - name: cloudtrail
+      attributes:
+        eventName: AttachRolePolicy
+      eventSource: "iam.amazonaws.com"

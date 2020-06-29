@@ -1,0 +1,43 @@
+---
+name: Update login profile for existing user
+author: Nick Jones
+description: |
+  An adversary may attempt to maintain access by updating an existing user's login profile, allowing them to authenticate to the AWS console with a password of their choice.
+platform: aws
+category: Persistence
+mitre_ids:
+  - T1098
+permissions:
+  - iam:UpdateLoginProfile
+input_arguments:
+  user:
+    description: IAM user to update the login profile for
+    type: str
+    value: "root"
+  password:
+    description: Password to configure for login profile
+    type: str
+    value: "@#$%^&*()TestPass1234567890"
+executors:
+  sh:
+    code: |
+      aws iam update-login-profile -user-name user -password password -no-password-reset-required
+  leonidas_aws:
+    implemented: True
+    clients:
+      - iam
+    code: |
+      result = clients["iam"].update_login_profile(
+          UserName=user,
+          Password=password,
+          PasswordResetRequired=False
+      )
+detection:
+  sigma_id: 1fd04a6c-cf1f-4169-a9aa-1fd495f99930
+  status: experimental
+  level: low
+  sources:
+    - name: cloudtrail
+      attributes:
+        eventName: UpdateLoginProfile
+        eventSource: iam.amazonaws.com

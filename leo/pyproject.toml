@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "leo"
+version = "0.1.0"
+description = ""
+authors = ["Nick Jones <nick.jones@f-secure.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+pyyaml = "^5.3.1"
+requests = "^2.23.0"
+python-json-logger = "^0.1.11"
+boto3 = "^1.13.11"
+black = "^19.10b0"
+pylint = "^2.5.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

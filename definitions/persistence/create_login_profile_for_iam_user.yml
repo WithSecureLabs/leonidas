@@ -1,0 +1,43 @@
+---
+name: Create login profile for existing user
+author: Nick Jones
+description: |
+  An adversary may attempt to maintain access by adding a login profile to a user that does not have one configured, allowing them to authenticate to the AWS console with a password of their choice
+platform: aws
+category: Persistence
+mitre_ids:
+  - T1098
+permissions:
+  - iam:CreateLoginProfile
+input_arguments:
+  user:
+    description: IAM user to create the login profile for
+    type: str
+    value: "root"
+  password:
+    description: Password to configure for login profile
+    type: str
+    value: "@#$%^&*()TestPass1234567890"
+executors:
+  sh:
+    code: |
+      aws iam create-login-profile -user-name user -password password -no-password-reset-required
+  leonidas_aws:
+    implemented: True
+    clients:
+      - iam
+    code: |
+      result = clients["iam"].create_login_profile(
+          UserName=user,
+          Password=password,
+          PasswordResetRequired=False
+      )
+detection:
+  sigma_id: e367ad8f-0173-4cb3-8f1a-9b76b69b9de1
+  status: experimental
+  level: low
+  sources:
+    - name: cloudtrail
+      attributes:
+        eventName: CreateLoginProfile
+        eventSource: iam.amazonaws.com

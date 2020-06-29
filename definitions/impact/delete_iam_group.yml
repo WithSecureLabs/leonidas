@@ -1,0 +1,35 @@
+---
+name: Delete IAM group
+author: Nick Jones
+description: |
+  An adversary may attempt to delete an IAM group within an account, to alter legitimate access or block administrative activity.
+platform: aws
+category: Impact
+mitre_ids:
+- T1531
+permissions:
+  - iam:DeleteGroup
+input_arguments:
+  group:
+    description: IAM group to delete
+    type: str
+    value: "example_group"
+executors:
+  sh:
+    code: |
+      aws iam delete-group --group-name {{ group }}
+  leonidas_aws:
+    implemented: True
+    clients:
+      - iam
+    code: |
+      result = clients["iam"].delete_group(GroupName=group)
+detection:
+  sigma_id: 84d2c61d-2882-4223-880d-5b69dce1c1d4
+  status: experimental
+  level: low
+  sources:
+    - name: "cloudtrail"
+      attributes:
+        eventName: "DeleteGroup"
+        eventSource: "*.iam.amazonaws.com"

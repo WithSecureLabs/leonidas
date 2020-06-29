@@ -1,0 +1,10 @@
+#!/usr/bin/python3
+
+from api.api_base import api, app
+
+{% for category in categories %}
+from api import {{category}}{% endfor %}
+
+
+if __name__ == "__main__":
+    app.run(debug=False)

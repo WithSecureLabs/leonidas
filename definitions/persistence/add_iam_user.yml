@@ -1,0 +1,35 @@
+---
+name: Add an IAM User
+author: Nick Jones
+description: |
+  An attacker may attempt to create an IAM user, in order to provide another means of authenticating to the AWS account
+platform: aws
+category: Persistence
+mitre_ids:
+  - T1136
+permissions:
+  - iam:CreateUser
+input_arguments:
+  user:
+    description: IAM user to create
+    type: str
+    value: "example-user"
+executors:
+  sh:
+    code: |
+      aws iam create-user --user-name {{ user }}
+  leonidas_aws:
+    implemented: True
+    clients:
+      - iam
+    code: |
+      result = clients["iam"].create_user(UserName=user)
+detection:
+  sigma_id: 6f660a21-0fcd-4b51-9894-4d2d8213f45b
+  status: experimental
+  level: low
+  sources:
+    - name: cloudtrail
+      attributes:
+        eventName: CreateUser
+        eventSource: iam.amazonaws.com

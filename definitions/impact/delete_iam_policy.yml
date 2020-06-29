@@ -1,0 +1,35 @@
+---
+name: Delete IAM Policy
+author: Nick Jones
+description: |
+  An adversary may attempt to delete an IAM policy within an account, to alter legitimate access or block administrative activity.
+platform: aws
+category: Impact
+mitre_ids:
+  - T1531
+permissions:
+  - iam:DeletePolicy
+input_arguments:
+  policy:
+    description: ARN of the IAM policy to delete
+    type: str
+    value: "EXAMPLEARNHERE"
+executors:
+  sh:
+    code: |
+      aws iam delete-policy --policy-arn {{ policy }}
+  leonidas_aws:
+    implemented: True
+    clients:
+      - iam
+    code: |
+      result = clients["iam"].delete_policy(PolicyArn=policy)
+detection:
+  sigma_id: d24b1d06-5da8-47a6-b3e2-be701113cf6e
+  status: experimental
+  level: low
+  sources:
+    - name: "cloudtrail"
+      attributes:
+        eventName: "DeletePolicy"
+        eventSource: "*.iam.amazonaws.com"

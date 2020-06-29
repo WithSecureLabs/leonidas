@@ -1,0 +1,14 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "LeonidasActions",
+            "Effect": "Allow",
+            "Action": [
+                {% for perm in permissions %}"{{ perm }}"{{ "," if not loop.last }}
+                {% endfor %}
+            ],
+            "Resource": "*"
+        }
+    ]
+}

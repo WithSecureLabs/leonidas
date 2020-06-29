@@ -1,0 +1,40 @@
+name: Update Inline Policy for User
+author: Nick Jones
+description: |
+  An adversary may attempt to update the inline policy set on an IAM user, in order to alter the permissions assigned to a user they have compromised.
+platform: aws
+category: Privilege Escalation
+mitre_ids:
+  - T1098
+permissions:
+  - iam:PutUserPolicy
+input_arguments:
+  user:
+    description: user to add policy to
+    type: str
+    value: NONE
+  policyname:
+    description: name of new inline policy
+    type: str
+    value: ExamplePolicy
+  policydocument:
+    description: file of new inline policy to set
+    type: file
+    value: file://examplepolicy.json
+executors:
+  sh:
+    code: |
+      aws iam put-user-policy --user-name {{ user }} --policy-name {{ policyname }} --policy-document {{ policydocument }}
+  leonidas_aws:
+    implemented: False
+    code: |
+      raise NotImplementedErrror
+detection:
+  sigma_id: 3f460fd0-f120-4c06-9365-140d1c4c8fda
+  status: experimental
+  level: low
+  sources:
+    - name: cloudtrail
+      attributes:
+        eventName: AttachGroupPolicy
+        eventSource: "iam.amazonaws.com"

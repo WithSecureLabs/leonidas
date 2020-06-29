@@ -1,0 +1,48 @@
+---
+name: Update guardduty ip set
+author: Nick Jones
+description: |
+  An adversary may attempt to alter a configured GuardDuty IP whitelist in order to whitelist systems they control and reduce the chance of malicious activity being detected.
+platform: aws
+category: Defense Evasion
+mitre_ids:
+  - T1089
+permissions:
+  - guardduty:UpdateIPSet
+input_arguments:
+  detectorid:
+    description: ID of the guardduty detector associated with the IP set list
+    type: str
+    value: "12345"
+  ipsetid:
+    description: ID of the IP set to be updated
+    type: str
+    value: "12345"
+  location:
+    description: Location of the IP whitelist
+    type: str
+    value: "http://www.example.com"
+executors:
+  sh:
+    code: |
+      aws guardduty update-ip-set --activate --detector-id {{ detectorid }} --ip-set-id {{ ipsetid }} --location {{ location }}
+  leonidas_aws:
+    implemented: True
+    clients:
+      - guardduty
+    code: |
+      result = clients['guardduty'].update_ip_set(
+        Activate=True, 
+        DetectorId=detectorid, 
+        IpSetId=ipsetid, 
+        Location=location
+      )
+detection:
+  sigma_id: 2faecc34-b0cb-4d41-872d-85186b6c2c6c
+  status: experimental
+  level: low
+  sources:
+    - name: "cloudtrail"
+      attributes:
+        eventName: "UpdateIPSet"
+        eventSource: "*.guardduty.amazonaws.com"

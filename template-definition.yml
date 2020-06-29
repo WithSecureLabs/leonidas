@@ -1,0 +1,36 @@
+---
+name: Access Secret in Secrets Manager
+author: Nick Jones
+description: |
+  An adversary may attempt to access the secrets in secrets manager, to steal certificates, credentials or other sensitive material
+platform: aws
+category: Credential Access
+mitre_ids:
+  - T1528
+permissions:
+  - secretsmanager:GetSecretValue
+  - kms:Decrypt
+input_arguments:
+  secretid:
+    description: ID of secret to access, either ARN or friendly name
+    type: str
+    value: "leonidas_created_secret"
+executors:
+  sh:
+    code: |
+      aws secretsmanager get-secret-value --secret-id {{ secretid }}
+  leonidas_aws:
+    implemented: True
+    clients:
+      - secretsmanager
+    code: |
+      result = clients["secretsmanager"].get_secret_value(SecretId=secretid)
+detection:
+  sigma_id: cbeba6f0-019e-4782-8c7e-e21b10521eed
+  status: experimental
+  level: low
+  sources:
+    - name: "cloudtrail"
+      attributes:
+        eventName: "GetSecretValue"
+        eventSource: "*.secretsmanager.amazonaws.com"

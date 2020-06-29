@@ -1,0 +1,31 @@
+---
+name: Enumerate VPC Flow Logs
+author: Nick Jones
+description: |
+  An adversary may attempt to enumerate which VPCs have flow logs configured, to identify what actions will be logged and where they will be logged to.
+category: "Discovery"
+mitre_ids:
+  - T1526
+platform: aws
+permissions:
+  - ec2:DescribeFlowLogs
+input_arguments:
+executors:
+  sh:
+    code: |
+      aws ec2 describe-flow-logs
+  leonidas_aws:
+    implemented: True
+    clients:
+      - ec2
+    code: |
+      result = clients["ec2"].describe_flow_logs()
+detection:
+  sigma_id: 1e1cb77a-3ee5-476b-bf20-c233f0742a8f
+  status: experimental
+  level: low
+  sources:
+    - name: "cloudtrail"
+      attributes:
+        eventName: "DescribeFlowLogs"
+        eventSource: "*.ec2.amazonaws.com"

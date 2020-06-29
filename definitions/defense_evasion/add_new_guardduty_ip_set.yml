@@ -1,0 +1,47 @@
+---
+name: Add new guardduty ip set
+author: Nick Jones
+description: "An adversary may attempt to add a new GuardDuty IP whitelist in order to whitelist systems they control and reduce the chance of malicious activity being detected."
+platform: aws
+category: Defense Evasion
+mitre_ids:
+  - T1089
+permissions:
+  - guardduty:CreateIPSet
+input_arguments:
+  detectorid:
+    description: ID of the guardduty detector associated with the IP set list
+    type: str
+    value: "12345"
+  format:
+    description: Format of the new IP set list - choice of TXT, STIX, OTX_CSV, ALIEN_VAULT, PROOF_POINT, FIRE_EYE
+    type: str
+    value: "TXT"
+  location:
+    description: Location of the IP whitelist
+    type: str
+    value: "http://www.example.com"
+executors:
+  sh:
+    code: |
+      aws guardduty create-ip-set --activate --detector-id {{ detectorid }} --format {{ format }} --location {{ location }}
+  leonidas_aws:
+    implemented: True
+    clients:
+      - guardduty
+    code: |
+      result = clients['guardduty'].create_ip_set(
+        Activate=True, 
+        DetectorId=detectorid, 
+        Location=location, 
+        Format=format
+      )
+detection:
+  sigma_id: faf89476-061a-4c29-8f9c-2ed65e65de2e
+  status: experimental
+  level: low
+  sources:
+    - name: "cloudtrail"
+      attributes:
+        eventName: "CreateIPSet"
+        eventSource: "*.guardduty.amazonaws.com"

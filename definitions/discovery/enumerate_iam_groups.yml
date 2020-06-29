@@ -1,0 +1,31 @@
+---
+name: Enumerate IAM groups
+author: Nick Jones
+description: |
+  An adversary may attempt to enumerate the configured IAM groups within an account, to identify entities that they might wish to gain access to or backdoor.
+platform: aws
+category: Discovery
+mitre_ids:
+  - T1069
+permissions:
+  - iam:ListGroups
+input_arguments:
+executors:
+  sh:
+    code: |
+      aws iam list-groups
+  leonidas_aws:
+    implemented: True
+    clients:
+      - iam
+    code: |
+      result = clients["iam"].list_groups()
+detection:
+  sigma_id: 88d0e794-1e66-4d93-bf3b-4628bd09aaa3
+  status: experimental
+  level: low
+  sources:
+    - name: "cloudtrail"
+      attributes:
+        eventName: "ListGroups"
+        eventSource: "*.iam.amazonaws.com"

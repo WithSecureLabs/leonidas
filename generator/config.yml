@@ -1,0 +1,8 @@
+---
+# Folder to load leonidas definitions from
+definitions_path: ../definitions
+# Directory to use for output
+output_dir: ../output
+region: us-east-1
+resources:
+  - "\"*\""

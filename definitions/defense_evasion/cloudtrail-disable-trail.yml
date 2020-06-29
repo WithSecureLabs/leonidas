@@ -1,0 +1,33 @@
+---
+name: Cloudtrail disable trail
+author: Nick Jones
+description: |
+  An attacker may attempt to disable a cloudtrail instance in order to avoid detection
+platform: aws
+category: Defense Evasion
+mitre_ids:
+  - T1089
+permissions:
+  - cloudtrail:StopLogging
+input_arguments:
+  trailname:
+    description: Name of the cloudtrail to be targeted
+    type: str
+    value: "example-cloudtrail"
+executors:
+  sh:
+    code: |
+      aws cloudtrail stop-logging --name {{ trailname }}
+  leonidas_aws:
+    implemented: False
+    code: |
+      raise NotImplementedError
+detection:
+  sigma_id: bf856088-70f3-498b-af19-f061c0bd7740
+  status: experimental
+  level: low
+  sources:
+    - name: "cloudtrail"
+      attributes:
+        eventName: "StopLogging"
+        eventSource: "*.cloudtrail.amazonaws.com"

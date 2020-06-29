@@ -1,0 +1,31 @@
+---
+name: Enumerate IAM Permissions with GetAccountAuthorizationDetails
+author: Nick Jones
+description: |
+  An adversary may attempt to enumerate the configured IAM users within an account, to identify entities that they might wish to gain access to or backdoor.
+platform: aws
+category: "Discovery"
+mitre_ids:
+  - T1069
+permissions:
+  - iam:GetAccountAuthorizationDetails
+input_arguments:
+executors:
+  sh:
+    code: |
+      aws iam get-account-authorization-details
+  leonidas_aws:
+    implemented: True
+    clients:
+      - iam
+    code: |
+      result = clients["iam"].get_account_authorization_details()
+detection:
+  sigma_id: 53597a1f-06bd-4a81-9378-7e889fed52c4
+  status: experimental
+  level: low
+  sources:
+    - name: "cloudtrail"
+      attributes:
+        eventName: "GetAccountAuthorizationDetails"
+        eventSource: "*.iam.amazonaws.com"

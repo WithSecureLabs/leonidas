@@ -1,0 +1,33 @@
+---
+name: Cloudtrail disable global event logging
+author: Nick Jones
+description: |
+  An adversary may attempt to disable global event logging in order to modify configuration of global services such as IAM
+platform: aws
+category: Defense Evasion
+mitre_ids:
+  - T1089
+permissions:
+  - cloudtrail:UpdateTrail
+input_arguments:
+  trailname:
+    description: Name of the cloudtrail to be targeted
+    type: str
+    value: "example-cloudtrail"
+executors:
+  sh:
+    code: |
+      aws cloudtrail update-trail --name {{ trailname }} --no-include-global-service-events
+  leonidas_aws:
+    implemented: False
+    code: |
+      raise NotImplementedError
+detection:
+  sigma_id: e7b423d5-abd1-4685-988a-cf718c4d2f98
+  status: experimental
+  level: low
+  sources:
+    - name: "cloudtrail"
+      attributes:
+        eventName: "UpdateTrail"
+        eventSource: "*.cloudtrail.amazonaws.com"

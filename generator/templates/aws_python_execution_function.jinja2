@@ -1,0 +1,53 @@
+import datetime
+import json
+from flask import request
+from flask_restx import Resource, Namespace
+from .api_base import api, app
+from .utils import json_serial, get_clients, aws_define_identity
+
+{% for case in cases %}
+class {{ case['name']|title|replace(" ", "") }}(Resource):
+    """
+    API Class for {{ case['name'] }}
+    """
+    
+    @api.doc(params={ {% if case['input_arguments'] %}{% for arg, contents in case['input_arguments'].items() %}
+        '{{ arg }}': '{{ contents['description'] }}', {% endfor %}{% endif %}
+        'role_arn': 'ARN of a role to assume',
+        'access_key_id': 'Access key ID for an entity to execute the test case as. Must be combined with secret_access_key',
+        'secret_access_key': 'Secret access key to match the access_key_id'
+        }
+    )
+    {% if case['input_arguments'] %}def post(self):{% else %}def get(self):{% endif %}
+        """
+        {{ case['description']|wordwrap|indent }}
+        """
+        {% if case['input_arguments'] %}{% for arg, contents in case['input_arguments'].items() %}{{ arg }} = request.args.get("{{ arg }}") or {% if "str" in contents['type'] %}"{{ contents['value'] }}"{% else %}{{ contents['value'] }}{% endif %}
+        {% endfor %}{% endif %}
+        identity = aws_define_identity(request)
+        try:
+            clients = get_clients(identity, {{ case["executors"]["leonidas_aws"]['clients'] }})
+            {{ case["executors"]["leonidas_aws"]["rendered"] |indent(width=12) }}
+        except Exception as excpt:
+            result = excpt
+        event_dict = {
+            "request": {
+                "usecase": request.path,
+                "args": request.args,
+                "timestamp": datetime.datetime.now(tz=datetime.timezone.utc),
+                "identity": identity
+            },
+            "response": result
+        }
+        print(json.dumps(event_dict, default=json_serial))
+        return result
+{% endfor %}
+
+ns = Namespace('{{ category }}', description='{{ category|replace('_', ' ')|title }}')
+
+{% for case in cases %}
+ns.add_resource({{ case['name']|title|replace(" ", "") }}, '/{{ case['name']|replace(" ", "_")|lower }}'){% endfor %}
+api.add_namespace(ns)
+
+if __name__ == "__main__":
+    app.run(debug=False)

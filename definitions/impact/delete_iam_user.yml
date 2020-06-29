@@ -1,0 +1,35 @@
+---
+name: Delete IAM user
+author: Nick Jones
+description: |
+  An adversary may attempt to delete an IAM user within an account, to alter legitimate access or block administrative activity.
+platform: aws
+category: Impact
+mitre_ids:
+  - T1531
+permissions:
+  - iam:DeleteUser
+input_arguments:
+  user:
+    description: IAM user to delete
+    type: str
+    value: "example_user"
+executors:
+  sh:
+    code: |
+      aws iam delete-user --user-name {{ user }}
+  leonidas_aws:
+    implemented: True
+    clients:
+      - iam
+    code: |
+      result = clients["iam"].delete_user(UserName=user)
+detection:
+  sigma_id: aeffd059-cd63-4ff5-ac5f-63c79237c6fa
+  status: experimental
+  level: low
+  sources:
+    - name: "cloudtrail"
+      attributes:
+        eventName: "DeleteUser"
+        eventSource: "*.iam.amazonaws.com"

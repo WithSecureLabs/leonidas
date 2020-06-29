@@ -1,0 +1,44 @@
+# {{ case['name'] }}
+
+| Platform               | Author               | Last Update                 |
+| ---------------------- | -------------------- | --------------------------- |
+| {{ case["platform"] }} | {{ case["author"] }} | {{ case["last_modified"] }} |
+
+{{ case['description'] | trim}}
+
+## MITRE IDs
+{% for id in case["mitre_ids"] %}
+* [{{ id }}](https://attack.mitre.org/techniques/{{ id }}/){% endfor %}
+
+## Required Permissions
+
+{% for permission in case['permissions'] %}* {{ permission }}
+{% endfor %}
+## Required Parameters
+{% if case['input_arguments'] %}
+| Name       | Type                  | Description                  | Example Value          |
+| ---------- | --------------------- | ---------------------------- | ---------------------- |
+{% for name, details in case['input_arguments'].items() %}| {{ name }} | {{ details['type'] }} | {{ details['description'] }} | {{ details['value'] }} |
+{% endfor %}{% else %}
+None{% endif %}
+## Attacker Action
+
+```bash
+{{ case['compiled_command'] }}
+```
+
+## Detection Case
+
+### ELK query
+
+When logs are ingested into ELK, the following Lucene query can be used to identify relevant events.
+
+```
+{{ case['lucene_query'] }}
+```
+
+### Sigma Definition
+
+```yaml
+{{ case["sigma"] }}
+```

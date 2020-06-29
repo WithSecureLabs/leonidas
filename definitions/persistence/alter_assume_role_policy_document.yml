@@ -1,0 +1,43 @@
+---
+name: Add an entity to an IAM role assumption policy
+author: Nick Jones
+description: |
+  None
+platform: aws
+category: Persistence
+mitre_ids:
+  - T1098
+permissions:
+  - iam:GetRole
+  - iam:UpdateAssumeRolePolicy
+input_arguments:
+  role:
+    description: Name of role to alter
+    type: str
+    value: "OrganizationAccountAccessRole"
+  entityarn:
+    description: ARN of entity to add to the policy
+    type: str
+    value: "arn:aws:iam::000000000000:root"
+executors:
+  sh:
+    code: |
+      aws -h
+  leonidas_aws:
+    implemented: true
+    clients:
+      - iam
+    code: |
+      role_data = clients["iam"].get_role(RoleName=role)
+      assumeroledoc = role_data["Role"]["AssumeRolePolicyDocument"]
+      assumeroledoc["Statement"][0]["Principal"]["AWS"].append(entityarn)
+      result = clients["iam"].update_assume_role_policy(RoleName=role,PolicyDocument=json.dumps(assumeroledoc))
+detection:
+  sigma_id: 8dc9a4f7-ce41-4962-a2d2-5625d9e2502d
+  status: experimental
+  level: low
+  sources:
+    - name: cloudtrail
+      attributes:
+        eventName: None
+        eventSource: None

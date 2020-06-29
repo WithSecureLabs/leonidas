@@ -1,0 +1,42 @@
+---
+name: Change default policy version
+author: Nick Jones
+description: |
+  An attacker may attempt to change the default policy version of a policy to one that includes a different set of permissions
+platform: aws
+category: Privilege Escalation
+mitre_ids:
+  - T1098
+permissions:
+  - iam:SetDefaultPolicyVersion
+input_arguments:
+  policy_arn:
+    description: ARN of the policy to create a new version for
+    type: str
+    value: "arn:aws:iam::123456789012:policy/test"
+  policy_version:
+    description: Version of the policy to set as default
+    type: str
+    value: "v2"
+executors:
+  sh:
+    code: |
+      aws iam set-default-policy-version –policy-arn policy_arn –version-id policy_version
+  leonidas_aws:
+    implemented: True
+    clients:
+      - iam
+    code: |
+      result = clients["iam"].set_default_policy_version(
+          PolicyArn=policy_arn,
+          VersionId=policy_version
+      )
+detection:
+  sigma_id: 089c1b6a-1d77-4071-aac7-c91488ad88d5
+  status: experimental
+  level: low
+  sources:
+    - name: cloudtrail
+      attributes:
+        eventName: SetDefaultPolicyVersion
+        eventSource: iam.amazonaws.com

@@ -1,0 +1,1 @@
+{% for source in sources %}{% for attrib in source['attributes'] %}{{ attrib }}:{{ source['attributes'][attrib] }} {% if loop.index < source['attributes']|length %}AND{% endif %} {% endfor %}{% endfor %}

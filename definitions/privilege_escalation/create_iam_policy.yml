@@ -1,0 +1,42 @@
+---
+name: Create Policy
+author: Nick Jones
+description: |
+  An attacker may attempt to create a new version of a given IAM policy in order to attach extra permissions to an entity they control.
+platform: aws
+category: Privilege Escalation
+mitre_ids:
+  - T1098
+permissions:
+  - iam:CreatePolicy
+input_arguments:
+  policy_name:
+    description: ARN of the policy to create a new version for
+    type: str
+    value: "arn:aws:iam::123456789012:policy/test"
+  policy_document:
+    description: New policy to upload - for the CLI, this should be a path to the json document. For Leonidas, this should be the JSON document itself.
+    type: str
+    value: "file://path/to/administrator/policy.json"
+executors:
+  sh:
+    code: |
+      aws iam create-policy --policy-name {{ policy_name }} --policy-document {{ policy_document }}
+  leonidas_aws:
+    implemented: True
+    clients:
+      - iam
+    code: |
+      result = clients["iam"].create_policy(
+        PolicyName=policy_arn,
+        PolicyDocument=policy_document
+      )
+detection:
+  sigma_id: 1352e02d-4207-4709-8980-b3a08f346c6d
+  status: experimental
+  level: low
+  sources:
+    - name: cloudtrail
+      attributes:
+        eventName: CreatePolicy
+        eventSource: iam.amazonaws.com

@@ -1,0 +1,33 @@
+---
+name: Cloudtrail disable multi-region logging
+author: Nick Jones
+description: |
+  An adversary may attempt to disable multi-region logging in order to perform actions in other regions without detection
+platform: aws
+category: Defense Evasion
+mitre_ids:
+  - T1089
+permissions:
+  - cloudtrail:UpdateTrail
+input_arguments:
+  trailname:
+    description: Name of the cloudtrail to be targeted
+    type: str
+    value: "example-cloudtrail"
+executors:
+  sh:
+    code: |
+      aws cloudtrail update-trail --name {{ trailname }} --no-is-multi-region-trail
+  leonidas_aws:
+    implemented: False
+    code: |
+      raise NotImplementedError
+detection:
+  sigma_id: 2bc6d6d1-fde2-4767-b1e3-809aa8f5c200
+  status: experimental
+  level: low
+  sources:
+    - name: "cloudtrail"
+      attributes:
+        eventName: "UpdateTrail"
+        eventSource: "*.cloudtrail.amazonaws.com"

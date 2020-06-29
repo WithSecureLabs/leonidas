@@ -1,0 +1,39 @@
+---
+name: Add an IAM User to a Group
+author: Nick Jones
+description: |
+  An attacker may attempt to add an IAM user to a group, in order to escalate their privileges
+platform: aws
+category: Privilege Escalation
+mitre_ids:
+  - T1098
+permissions:
+  - iam:AddUserToGroup
+input_arguments:
+  group:
+    description: Group to add user to
+    type: str
+    value: "example-group"
+  user:
+    description: IAM user to add to group
+    type: str
+    value: "example-user"
+executors:
+  sh:
+    code: |
+      aws iam add-user-to-group --group-name {{ group }} --user-name {{ user }}
+  leonidas_aws:
+    implemented: True
+    clients:
+      - iam
+    code: |
+      result = clients["iam"].add_user_to_group(GroupName=group, UserName=user)
+detection:
+  sigma_id: 6e467337-484c-4b11-8a83-fb92af74afed
+  status: experimental
+  level: low
+  sources:
+    - name: cloudtrail
+      attributes:
+        eventName: AddUserToGroup
+        eventSource: iam.amazonaws.com

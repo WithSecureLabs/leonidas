@@ -1,0 +1,36 @@
+name: Cloudtrail alter encryption configuration
+author: Nick Jones
+description: |
+  Alter cloudtrail encryption configuration such that log ingestion can no longer read logs
+platform: aws
+category: Defense Evasion
+mitre_ids:
+  - T1089
+permissions:
+  - cloudtrail:UpdateTrail
+input_arguments:
+  trailname:
+    description: Name of the cloudtrail to be targeted
+    type: str
+    value: "example-cloudtrail"
+  kmskeyid:
+    description: KMS key ID to use, supply an empty string to disable encryption
+    type: str
+    value: ""
+executors:
+  sh:
+    code: |
+      aws cloudtrail update-trail --name {{ trailname }} --kms-key-id {{ kmskeyid }}
+  leonidas_aws:
+    implemented: False
+    code: |
+      raise NotImplementedError
+detection:
+  sigma_id: 76e19d12-2ed2-4dfc-b9e9-f3b235ee471a
+  status: experimental
+  level: low
+  sources:
+    - name: "cloudtrail"
+      attributes:
+        eventName: "UpdateTrail"
+        eventSource: "*.cloudtrail.amazonaws.com"

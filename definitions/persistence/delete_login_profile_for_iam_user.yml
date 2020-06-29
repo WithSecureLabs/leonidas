@@ -1,0 +1,37 @@
+---
+name: Delete login profile for existing user
+author: Nick Jones
+description: |
+  None
+platform: aws
+category: Persistence
+mitre_ids:
+  - T1531
+permissions:
+  - iam:DeleteLoginProfile
+input_arguments:
+  user:
+    description: IAM user to delete the login profile for
+    type: str
+    value: "root"
+executors:
+  sh:
+    code: |
+      aws iam delete-login-profile -user-name user
+  leonidas_aws:
+    implemented: True
+    clients:
+      - iam
+    code: |
+      result = clients["iam"].delete_login_profile(
+          UserName=user
+      )
+detection:
+  sigma_id: 7c3333ce-9d4b-4704-8311-a4b68fe0f5f9
+  status: experimental
+  level: low
+  sources:
+    - name: cloudtrail
+      attributes:
+        eventName: DeleteLoginProfile
+        eventSource: iam.amazonaws.com

@@ -1,0 +1,42 @@
+---
+name: Add a policy to a user
+author: Nick Jones
+description: |
+  An adversary may attempt to add a policy to a user, in order to escalate the privileges of that user.
+platform: aws
+category: Privilege Escalation
+mitre_ids:
+  - T1098
+permissions:
+  - iam:AttachUserPolicy
+input_arguments:
+  user:
+    description: User to add policy to
+    type: str
+    value: root
+  policyarn:
+    description: Policy to add to user
+    type: str
+    value: arn:aws:iam::aws:policy/ReadOnlyAccess
+executors:
+  sh:
+    code: |
+      aws iam attach-user-policy --user-name {{ user['value'] }} --policy-arn {{ policyarn['value'] }}
+  leonidas_aws:
+    implemented: True
+    clients:
+      - iam
+    code: |
+      result = clients["iam"].attach_user_policy(
+          UserName=user,
+          PolicyArn=policyarn
+      )
+detection:
+  sigma_id: ca08ef1e-c37a-4a7e-b1a0-670519faacc2
+  status: experimental
+  level: low
+  sources:
+    - name: cloudtrail
+      attributes:
+        eventName: AttachRolePolicy
+        eventSource: "iam.amazonaws.com"

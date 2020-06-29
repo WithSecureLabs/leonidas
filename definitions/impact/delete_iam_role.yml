@@ -1,0 +1,35 @@
+---
+name: Delete IAM Role
+author: Nick Jones
+description: |
+  An adversary may attempt to delete an IAM role within an account, to alter legitimate access or block administrative activity.
+platform: aws
+category: Impact
+mitre_ids:
+  - T1531
+permissions:
+  - iam:DeleteRole
+input_arguments:
+  role:
+    description: IAM role to delete
+    type: str
+    value: "example_role"
+executors:
+  sh:
+    code: |
+      aws iam delete-role --role-name {{ role }}
+  leonidas_aws:
+    implemented: True
+    clients:
+      - iam
+    code: |
+      result = clients["iam"].delete_role(RoleName=role)
+detection:
+  sigma_id: 999d40d4-9f65-4b5c-ad2d-349a07a4b6c3
+  status: experimental
+  level: low
+  sources:
+    - name: "cloudtrail"
+      attributes:
+        eventName: "DeleteRole"
+        eventSource: "*.iam.amazonaws.com"

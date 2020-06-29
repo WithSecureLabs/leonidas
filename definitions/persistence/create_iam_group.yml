@@ -1,0 +1,35 @@
+---
+name: Create IAM group
+author: Nick Jones
+description: |
+  An adversary may attempt to create an IAM group within an account, to alter legitimate access or block administrative activity.
+platform: aws
+category: Persistence
+mitre_ids:
+  - T1098
+permissions:
+  - iam:CreateGroup
+input_arguments:
+  group:
+    description: IAM group to create
+    type: str
+    value: "example_group"
+executors:
+  sh:
+    code: |
+      aws iam create-group --group-name {{ group }}
+  leonidas_aws:
+    implemented: True
+    clients:
+      - iam
+    code: |
+      result = clients["iam"].create_group(GroupName=group)
+detection:
+  sigma_id: 4b33f970-ef9d-49e0-ae7d-040e60d96415
+  status: experimental
+  level: low
+  sources:
+    - name: "cloudtrail"
+      attributes:
+        eventName: "CreateGroup"
+        eventSource: "*.iam.amazonaws.com"

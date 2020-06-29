@@ -1,0 +1,35 @@
+---
+name: Get GuardDuty Detector
+author: Nick Jones
+description: |
+  None
+category: "Discovery"
+mitre_ids:
+  - T1063
+platform: aws
+permissions:
+  - guardduty:GetDetector
+input_arguments:
+  detectorid:
+    description: ID of guardduty detector
+    type: str
+    value: NONE
+executors:
+  sh:
+    code: |
+      aws guardduty get-detector --detector-id {{ detectorid }}
+  leonidas_aws:
+    implemented: True
+    clients:
+      - guardduty
+    code: |
+      result = clients["guardduty"].get_detector(DetectorId=detectorid)
+detection:
+  sigma_id: 6fc4c001-6f00-46e1-9168-5717b5f7068a
+  status: experimental
+  level: low
+  sources:
+    - name: "cloudtrail"
+      attributes:
+        eventName: "GetDetector"
+        eventSource: "*.ec2.amazonaws.com"

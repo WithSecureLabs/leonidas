@@ -1,0 +1,37 @@
+---
+name: Add API key to existing IAM user
+author: Nick Jones
+description: |
+  An adversary may attempt to maintain access by creating an API key attached to an existing privileged user
+platform: aws
+category: Persistence
+mitre_ids:
+  - T1098
+permissions:
+  - iam:CreateAccessKey
+input_arguments:
+  user:
+    description: IAM user to generate the API key for
+    type: str
+    value: "root"
+executors:
+  sh:
+    code: |
+      aws iam create-access-key --user-name {{ user }}
+  leonidas_aws:
+    implemented: True
+    clients:
+      - iam
+    code: |
+      result = clients["iam"].create_access_key(
+          UserName=user
+      )
+detection:
+  sigma_id: 1570ea27-492c-4615-a518-59155ba03416
+  status: experimental
+  level: low
+  sources:
+    - name: cloudtrail
+      attributes:
+        eventName: CreateAccessKey
+        eventSource: iam.amazonaws.com

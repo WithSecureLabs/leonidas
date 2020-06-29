@@ -1,0 +1,31 @@
+---
+name: Enumerate IAM users
+author: Nick Jones
+category: "Discovery"
+description: |
+  An adversary may attempt to enumerate the configured IAM users within an account, to identify entities that they might wish to gain access to or backdoor.
+mitre_ids:
+  - T1033
+platform: aws
+permissions:
+  - iam:ListUsers
+input_arguments:
+executors:
+  sh:
+    code: |
+      aws iam list-users
+  leonidas_aws:
+    implemented: True
+    clients:
+      - iam
+    code: |
+      result = clients["iam"].list_users()
+detection:
+  sigma_id: 329a2783-4410-47b2-a113-36200ab1037a
+  status: experimental
+  level: low
+  sources:
+    - name: "cloudtrail"
+      attributes:
+        eventName: "ListUsers"
+        eventSource: "*.iam.amazonaws.com"

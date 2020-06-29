@@ -1,0 +1,29 @@
+name: Enumerate Cloudtrails for Current Region
+description: |
+  An adversary may attempt to enumerate the configured trails, to identify what actions will be logged and where they will be logged to. In AWS, this may start with a single call to enumerate the trails applicable to the default region.
+category: "Discovery"
+platform: aws
+mitre_ids:
+permissions:
+  - cloudtrail:DescribeTrails
+input_arguments:
+executors:
+  sh:
+    code: |
+      aws cloudtrail describe-trails
+  leonidas_aws:
+    implemented: True
+    clients:
+      - cloudtrail
+    code: |
+      client = boto3.client('cloudtrail')
+      result = client.describe_trails()
+detection:
+  sigma_id: GUID
+  status: experimental
+  level: low
+  sources:
+    - name: "cloudtrail"
+      attributes:
+        eventName: "DescribeTrails"
+        eventSource: "*.cloudtrail.amazonaws.com"

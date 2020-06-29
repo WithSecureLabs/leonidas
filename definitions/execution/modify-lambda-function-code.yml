@@ -1,0 +1,37 @@
+---
+name: Modify Lambda Function Code
+author: Nick Jones
+description: |
+  An attacker may attempt to modify the code that a lambda function executes in order to gain a foothold in the environment
+platform: aws
+category: Execution
+mitre_ids:
+  - T1064
+permissions:
+  - lambda:UpdateFunctionCode
+input_arguments:
+  functionname:
+    description: Name of the function to be targeted
+    type: str
+    value: "example-function"
+  zipfile:
+    description: Filename of the zip file of code to be uploaded
+    type: str
+    value: "file.zip"
+executors:
+  sh:
+    code: |
+      aws lambda update-function-code --function-name {{ functionname }} --zip-file {{ zipfile }} --publish
+  leonidas_aws:
+    implemented: False
+    code: |
+      raise NotImplementedError
+detection:
+  sigma_id: 7890b11c-19b3-4fb9-bbec-cae87db769ca
+  status: experimental
+  level: low
+  sources:
+    - name: cloudtrail
+      attributes:
+        eventName: None
+        eventSource: None

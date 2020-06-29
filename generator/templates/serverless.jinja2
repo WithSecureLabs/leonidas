@@ -1,0 +1,54 @@
+# serverless.yml
+
+service: leonidas
+
+plugins:
+  - serverless-python-requirements
+  - serverless-wsgi
+
+custom:
+  wsgi:
+    app: leonidas.app
+    packRequirements: false
+  pythonRequirements:
+    slim: false
+    usePoetry: false
+
+provider:
+  name: aws
+  runtime: python3.7
+  stage: dev
+  region: {{ region }}
+  apiKeys:
+    - NickKey1
+    - NickKey2
+  iamManagedPolicies:
+    - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  iamRoleStatements:
+    - Effect: Allow
+      Action:{% for perm in permissions %}
+        - {{ perm }}{% endfor %}
+        - sts:AssumeRole
+      Resource:{% for resource in resources %}
+        - {{ resource }}{% endfor %}
+  logs:
+    restApi: true
+
+functions:
+  app:
+    handler: wsgi_handler.handler
+    timeout: 10
+    events:
+      - http: 
+          path: /
+          method: ANY
+      - http: 
+          path: /swaggerui/{proxy+}
+          method: ANY
+      - http: 
+          path: /swagger.json
+          method: ANY
+      - http:
+          path: /{proxy+}
+          method: ANY
+          private: true
