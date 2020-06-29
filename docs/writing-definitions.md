@@ -4,7 +4,7 @@ Each definition contains a number of fields, these are broken down in this docum
 
 ## Validating Test cases
 
-It's possible to run some basic validation on your new test cases with the following command. This will spot missing fields, primarily, but may also catch some syntax errors in the python executor definitions.
+It's possible to run some basic validation on your new test cases with the following command. This will spot missing fields primarily, but may also catch some syntax errors in the python executor definitions.
 
 * `poetry run ./generator.py validate`
 
