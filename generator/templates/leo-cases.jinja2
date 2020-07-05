@@ -7,10 +7,6 @@ creds:
   # access_key_id:
   # secret_access_key:
 cases:
-#   get_caller_identity:
-#     name: "Get Caller Identity"
-#     path: "enumeration/get_caller_identity"
-#     args:
 {% for case in cases %}
     {{ case.name|lower|replace(" ", "_") }}:
         # {{ case.description|replace("\n", "") }}

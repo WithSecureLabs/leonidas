@@ -47,7 +47,7 @@ class {{ case['name']|title|replace(" ", "")|replace("-", "") }}(Resource):
 ns = Namespace('{{ category }}', description='{{ category|replace('_', ' ')|title }}')
 
 {% for case in cases %}
-ns.add_resource({{ case['name']|title|replace(" ", "") }}, '/{{ case['name']|replace(" ", "_")|lower }}'){% endfor %}
+ns.add_resource({{ case['name']|title|replace(" ", "")|replace("-", "") }}, '/{{ case['name']|replace(" ", "_")|replace("-", "")|lower }}'){% endfor %}
 api.add_namespace(ns)
 
 if __name__ == "__main__":
