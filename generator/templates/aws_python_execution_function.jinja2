@@ -6,7 +6,7 @@ from .api_base import api, app
 from .utils import json_serial, get_clients, aws_define_identity
 
 {% for case in cases %}
-class {{ case['name']|title|replace(" ", "") }}(Resource):
+class {{ case['name']|title|replace(" ", "")|replace("-", "") }}(Resource):
     """
     API Class for {{ case['name'] }}
     """
@@ -15,7 +15,8 @@ class {{ case['name']|title|replace(" ", "") }}(Resource):
         '{{ arg }}': '{{ contents['description'] }}', {% endfor %}{% endif %}
         'role_arn': 'ARN of a role to assume',
         'access_key_id': 'Access key ID for an entity to execute the test case as. Must be combined with secret_access_key',
-        'secret_access_key': 'Secret access key to match the access_key_id'
+        'secret_access_key': 'Secret access key to match the access_key_id',
+        'region': 'Region to use for the API call'
         }
     )
     {% if case['input_arguments'] %}def post(self):{% else %}def get(self):{% endif %}
