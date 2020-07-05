@@ -17,6 +17,7 @@ if __name__ == "__main__":
     config = yaml.safe_load(open(sys.argv[1], "r"))
     print("Url: {}".format(config["url"]))
     for case in config["cases"]:
+        print(config["cases"][case]["name"])
         url = config["url"] + config["cases"][case]["path"]
         headers = {}
         # if we're running Leonidas locally, no need for an API key, so let's not error out if there's not one in the config
@@ -33,12 +34,14 @@ if __name__ == "__main__":
                 args = {}
         else:
             args = {}
-        
+
         # TODO: Support access keys here
         if ("creds" in config) and (config["creds"] is not None):
             if "role_arn" in config["creds"]:
                 args["role_arn"] = config["creds"]["role_arn"]
-        print(config["cases"][case]["name"])
+            elif ("access_key_id" in config["creds"]) and ("secret_access_key" in config["creds"]):
+                args["access_key_id"] = config["creds"]["access_key_id"]
+                args["secret_access_key"] = config["creds"]["secret_access_key"]
 
         # If it's a request with parameters it'll need to be POSTed, otherwise it's a GET request
         if ("args" in config["cases"][case]) and (config["cases"][case]["args"] is not None):

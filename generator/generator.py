@@ -3,7 +3,6 @@
 import json
 import os
 from pathlib import Path
-import sys
 
 import jinja2
 import typer
@@ -120,7 +119,8 @@ def iam_policy():
 @app.command()
 def serverless_config():
     """
-    Print the Serverless framework configuration used to deploy the Leonidas API to AWS
+    Print the Serverless framework configuration 
+    used to deploy the Leonidas API to AWS
     """
     generator.definitions.construct_definitions()
     print(generator.awsapigen.get_serverless_config(generator.definitions))
@@ -129,7 +129,8 @@ def serverless_config():
 @app.command()
 def leo():
     """
-    Generate the configuration file for Leo, the CLI tool for executing test cases against an instance of Leonidas
+    Generate the configuration file for Leo, the CLI tool 
+    for executing test cases against an instance of Leonidas
     """
     print("Generating Leo Case Configuration")
     generator.definitions.construct_definitions()

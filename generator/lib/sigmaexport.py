@@ -5,7 +5,6 @@ Code for generating the markdown used to build the documentation
 
 import os
 from collections import defaultdict
-import jinja2
 
 
 class SigmaExport:

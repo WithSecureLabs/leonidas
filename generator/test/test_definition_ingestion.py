@@ -31,9 +31,7 @@ class TestDefinitionIngestion(unittest.TestCase):
             True,
             "Should be in the Discovery category",
         )
-        self.assertEqual(
-            len(definitions.case_set), 1, "Should be a single case"
-        )
+        self.assertEqual(len(definitions.case_set), 1, "Should be a single case")
 
 
 if __name__ == "__main__":
