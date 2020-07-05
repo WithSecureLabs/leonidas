@@ -22,9 +22,11 @@ executors:
     code: |
       aws cloudtrail update-trail --name {{ trailname }} --kms-key-id {{ kmskeyid }}
   leonidas_aws:
-    implemented: False
+    implemented: true
+    clients:
+      - cloudtrail
     code: |
-      raise NotImplementedError
+      result = clients["cloudtrail"].update_trail(Name=trailname, KmsKeyId=kmskeyid)
 detection:
   sigma_id: 76e19d12-2ed2-4dfc-b9e9-f3b235ee471a
   status: experimental

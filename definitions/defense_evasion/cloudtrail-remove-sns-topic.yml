@@ -19,9 +19,11 @@ executors:
     code: |
       aws cloudtrail update-trail --name {{ trailname }} --sns-topic-name ''
   leonidas_aws:
-    implemented: False
+    implemented: true
+    clients:
+      - cloudtrail
     code: |
-      raise NotImplementedError
+      result = clients["cloudtrail"].update_trail(Name=trailname, SnsTopicName="")
 detection:
   sigma_id: ff61896f-d9a6-40f8-8bb9-0b8c4d214af0
   status: experimental

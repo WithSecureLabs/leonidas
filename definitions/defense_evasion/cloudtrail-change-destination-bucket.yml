@@ -23,9 +23,11 @@ executors:
     code: |
       aws cloudtrail update-trail --name {{ trailname }} --s3-bucket-name {{ bucketname }}
   leonidas_aws:
-    implemented: False
+    implemented: true
+    clients:
+      - cloudtrail
     code: |
-      raise NotImplementedError
+      result = clients["cloudtrail"].update_trail(Name=trailname, S3BucketName=bucketname)
 detection:
   sigma_id: 9be7e8b4-dd76-4396-b3ca-10c6d8df1048
   status: experimental

@@ -19,9 +19,11 @@ executors:
     code: |
       aws cloudtrail update-trail --name {{ trailname }} --no-enable-log-file-validation
   leonidas_aws:
-    implemented: False
+    implemented: true
+    clients:
+      - cloudtrail
     code: |
-      raise NotImplementedError
+      result = clients["cloudtrail"].update_trail(Name=trailname, EnableLogFileValidation=False)
 detection:
   sigma_id: e0608025-7e8e-4b26-8ac8-e7711d3df52f
   status: experimental

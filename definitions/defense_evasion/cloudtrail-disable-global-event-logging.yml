@@ -19,9 +19,11 @@ executors:
     code: |
       aws cloudtrail update-trail --name {{ trailname }} --no-include-global-service-events
   leonidas_aws:
-    implemented: False
+    implemented: true
+    clients:
+      - cloudtrail
     code: |
-      raise NotImplementedError
+      result = clients["cloudtrail"].update_trail(Name=trailname, IncludeGlobalServiceEvents=False)
 detection:
   sigma_id: e7b423d5-abd1-4685-988a-cf718c4d2f98
   status: experimental

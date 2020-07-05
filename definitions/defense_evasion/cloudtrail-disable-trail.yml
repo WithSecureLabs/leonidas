@@ -19,9 +19,11 @@ executors:
     code: |
       aws cloudtrail stop-logging --name {{ trailname }}
   leonidas_aws:
-    implemented: False
+    implemented: true
+    clients:
+      - cloudtrail
     code: |
-      raise NotImplementedError
+      result = clients["cloudtrail"].stop_logging(Name=trailname)
 detection:
   sigma_id: bf856088-70f3-498b-af19-f061c0bd7740
   status: experimental

@@ -19,9 +19,11 @@ executors:
     code: |
       aws cloudtrail update-trail --name {{ trailname }} --no-is-multi-region-trail
   leonidas_aws:
-    implemented: False
+    implemented: true
+    clients:
+      - cloudtrail
     code: |
-      raise NotImplementedError
+      result = clients["cloudtrail"].update_trail(Name=trailname, IsMultiRegionTrail=False)
 detection:
   sigma_id: 2bc6d6d1-fde2-4767-b1e3-809aa8f5c200
   status: experimental

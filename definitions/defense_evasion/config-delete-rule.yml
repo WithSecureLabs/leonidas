@@ -20,8 +20,10 @@ executors:
       aws configservice delete-config-rule --config-rule-name {{ rulename }}
   leonidas_aws:
     implemented: False
+    client:
+      - ConfigService
     code: |
-      raise NotImplementedError
+      result = clients["ConfigService"].delete_config_rule(ConfigRuleName=rulename)
 detection:
   sigma_id: 5934f0e7-e252-4f8c-bf2c-372da6ada60a
   status: experimental
