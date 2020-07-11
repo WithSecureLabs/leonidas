@@ -20,7 +20,8 @@ if __name__ == "__main__":
         print(config["cases"][case]["name"])
         url = config["url"] + config["cases"][case]["path"]
         headers = {}
-        # if we're running Leonidas locally, no need for an API key, so let's not error out if there's not one in the config
+        # if we're running Leonidas locally, no need for an API key, 
+        # so let's not error out if there's not one in the config
         try:
             headers["x-api-key"] = config["apikey"]
         except KeyError:
@@ -35,13 +36,15 @@ if __name__ == "__main__":
         else:
             args = {}
 
-        # TODO: Support access keys here
-        if ("creds" in config) and (config["creds"] is not None):
-            if "role_arn" in config["creds"]:
-                args["role_arn"] = config["creds"]["role_arn"]
-            elif ("access_key_id" in config["creds"]) and ("secret_access_key" in config["creds"]):
-                args["access_key_id"] = config["creds"]["access_key_id"]
-                args["secret_access_key"] = config["creds"]["secret_access_key"]
+        # load any credentials and region details configured in the caseconfig
+        if ("identity" in config) and (config["identity"] is not None):
+            if "role_arn" in config["identity"]:
+                args["role_arn"] = config["identity"]["role_arn"]
+            elif ("access_key_id" in config["identity"]) and ("secret_access_key" in config["identity"]):
+                args["access_key_id"] = config["identity"]["access_key_id"]
+                args["secret_access_key"] = config["identity"]["secret_access_key"]
+            if "region" in config["identity"]:
+                args["region"] = config["identity"]["region"]
 
         # If it's a request with parameters it'll need to be POSTed, otherwise it's a GET request
         if ("args" in config["cases"][case]) and (config["cases"][case]["args"] is not None):

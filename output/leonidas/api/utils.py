@@ -46,6 +46,7 @@ def aws_define_identity(request):
         "access_keys": False,
         "access_key_id": None,
         "secret_access_key": None,
+        "region": None
     }
     try:
         identity["role_arn"] = request.args.get("role_arn")
@@ -60,6 +61,14 @@ def aws_define_identity(request):
             identity["access_keys"] = True
     except Exception:
         traceback.print_exc()
+
+    try:
+        session = boto3.session.Session()
+        default_region = session.region_name
+        identity["region"] = request.args.get("region") or default_region
+    except Exception:
+        traceback.print_exc()    
+
     return identity
 
 
@@ -70,17 +79,17 @@ def get_clients(identity, client_list):
     clients = {}
     for client in client_list:
         if identity["assume_role"]:
-            clients[client] = get_client_roleassumption(client, identity["role_arn"])
+            clients[client] = get_client_roleassumption(client, identity["role_arn"], identity["region"])
         elif identity["access_keys"]:
             clients[client] = get_client_accesskey(
-                client, identity["access_key_id"], identity["secret_access_key"]
+                client, identity["access_key_id"], identity["secret_access_key"], identity["region"]
             )
         else:
-            clients[client] = boto3.client(client)
+            clients[client] = boto3.client(client, identity["region"])
     return clients
 
 
-def get_client_roleassumption(service, role_arn, session_name="LeonidasSession"):
+def get_client_roleassumption(service, role_arn, region, session_name="LeonidasSession"):
     """
     Assume a role, then return the relevant client.
 
@@ -97,10 +106,11 @@ def get_client_roleassumption(service, role_arn, session_name="LeonidasSession")
         aws_access_key_id=creds["AccessKeyId"],
         aws_secret_access_key=creds["SecretAccessKey"],
         aws_session_token=creds["SessionToken"],
+        region_name=region
     )
 
 
-def get_client_accesskey(service, access_key_id, secret_access_key):
+def get_client_accesskey(service, access_key_id, secret_access_key, region):
     """
     Return a client for a given service using a supplied access key
 
@@ -112,4 +122,5 @@ def get_client_accesskey(service, access_key_id, secret_access_key):
         service,
         aws_access_key_id=access_key_id,
         aws_secret_access_key=secret_access_key,
+        region_name=region
     )

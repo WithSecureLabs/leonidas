@@ -2,10 +2,11 @@
 apikey: 
 url: 
 sleeptime: 10
-creds:
+identity:
   # role_arn: 
   # access_key_id:
   # secret_access_key:
+  # region: {{ config["region"] }}
 cases:
 {% for case in cases %}
     {{ case.name|lower|replace(" ", "_") }}:

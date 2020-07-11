@@ -7,6 +7,7 @@ class LeoCaseGen:
     """
 
     def __init__(self, config, env):
+        self.config = config
         self.templates = {}
         self.templates["leo-cases"] = env.get_template("leo-cases.jinja2")
 
@@ -26,6 +27,6 @@ class LeoCaseGen:
         with open(os.path.join(outdir, "caseconfig.yml"), "w") as outfile:
             outfile.write(
                 self.templates["leo-cases"]
-                .render({"cases": cases})
+                .render({"cases": cases, "config": self.config})
                 .replace("\n\n", "\n")
             )
