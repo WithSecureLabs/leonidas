@@ -4,7 +4,7 @@ The `code` block within the `leonidas_aws` section should contain the Python cod
 
 ## Example test case code
 
-```
+```yaml
 [...]
 input_arguments:
   secretid:

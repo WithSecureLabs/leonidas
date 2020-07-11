@@ -45,3 +45,7 @@ It is possible to execute test cases as an arbitrary role by submitting the `rol
 ### AWS Access Keys
 
 Submitting `access_key_id` and `secret_access_key` parameters containing the Access Key ID and Secret Access Key respectively will cause Leonidas to execute a test case using those credentials.
+
+### Region-specific test case execution
+
+By default, test cases will run in the region in which the API is deployed, or in the default region specified in ~/.aws/config line if the API is running locally. It is possible to suppy a `region` parameter to the API, which will result in the test case being executed against that region. This parameter should contain the AWS region identifier, such as `us-east-1` or `eu-west-1`.

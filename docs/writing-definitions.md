@@ -8,12 +8,11 @@ It's possible to run some basic validation on your new test cases with the follo
 
 * `poetry run ./generator.py validate`
 
-
 ## Template contents
 
 An example template is shown below.
 
-```
+```yaml
 ---
 name: Access Secret in Secrets Manager
 author: Nick Jones
@@ -153,6 +152,8 @@ Indication of how critical the event is from a detection perspective. Should be 
 * `medium`
 * `high`
 * `critical`
+
+Given the nature of these test cases, it is expected that the majority will be set to `low` or `medium`, and used to inform an overall detection picture rather than triggering alerts directly.
 
 ### sources
 

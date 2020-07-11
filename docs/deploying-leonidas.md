@@ -1,3 +1,12 @@
+# Deploying Leonidas
+
+There are two supported options for deploying the Leonidas API:
+
+* Deploying the CI/CD pipeline into AWS, then letting that generate and deploy the API
+* Generating and running it locally
+
+The former is recommended for producton, as it provides a stronger security model (such as the built-in API key authentication on the API gateway deployed as part of the API). The latter is best suited for development purposes.
+
 ## Deploying Leonidas to AWS
 
 There are two parts to deploying Leonidas. First, the pipeline is created, then the API deployed.

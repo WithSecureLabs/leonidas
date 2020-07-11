@@ -1,4 +1,4 @@
-## Leonidas API Logging
+# Leonidas API Logging
 
 For each test case executed, Leonidas will create a log entry for that particular execution. The format of this is shown below.
 
@@ -38,10 +38,10 @@ For each test case executed, Leonidas will create a log entry for that particula
 Each log entry contains:
 
 * `request`: Defines what test case was triggered and how
-    * `usecase`: Which test case was executed
-    * `args`: Any parameters passed to the request
-    * `timestamp`: The time at which the test case was executed, as returned by Python's `datetime.datetime.now(tz=datetime.timezone.utc)`
-    * `identity`: The identity block for this test case, as defined in [writing-api-executors.md](./writing-api-executors.md)
+  * `usecase`: Which test case was executed
+  * `args`: Any parameters passed to the request
+  * `timestamp`: The time at which the test case was executed, as returned by Python's `datetime.datetime.now(tz=datetime.timezone.utc)`
+  * `identity`: The identity block for this test case, as defined in [writing-api-executors.md](./writing-api-executors.md)
 * `response`: The contents of the `result` variable, as discussed in [writing-api-executors.md](./writing-api-executors.md)
 
 ## Accessing the Logs
