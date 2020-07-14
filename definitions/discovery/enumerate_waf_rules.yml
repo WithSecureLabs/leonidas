@@ -5,7 +5,7 @@ description: |
   An attacker may attempt to enumerate the rulesets applied to any configured WAFs, to aid further exploitation of applications
 category: Discovery
 mitre_ids:
-  - T1063
+  - T1518.001
 platform: aws
 permissions:
   -  wafv2:ListWebACLs

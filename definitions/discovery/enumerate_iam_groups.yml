@@ -6,7 +6,7 @@ description: |
 platform: aws
 category: Discovery
 mitre_ids:
-  - T1069
+  - T1069.003
 permissions:
   - iam:ListGroups
 input_arguments:

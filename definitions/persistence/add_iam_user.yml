@@ -6,7 +6,7 @@ description: |
 platform: aws
 category: Persistence
 mitre_ids:
-  - T1136
+  - T1136.003
 permissions:
   - iam:CreateUser
 input_arguments:

@@ -5,7 +5,7 @@ description: "An adversary may attempt to add a new GuardDuty IP whitelist in or
 platform: aws
 category: Defense Evasion
 mitre_ids:
-  - T1089
+  - T1562
 permissions:
   - guardduty:CreateIPSet
 input_arguments:

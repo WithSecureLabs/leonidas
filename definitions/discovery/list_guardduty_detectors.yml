@@ -5,7 +5,7 @@ description: |
   None
 category: "Discovery"
 mitre_ids:
-  - T1063
+  - T1518.001
 platform: aws
 permissions:
   - guardduty:ListDetectors

@@ -6,7 +6,7 @@ description: |
   An adversary may attempt to verify their current identity with the credentials they hold. This could both be to verify that the credentials they hold are valid, and to get more information on their current identity for reconnaissance purposes.
 category: "Discovery"
 mitre_ids:
-  - T1087
+  - T1087.004
 platform: aws
 permissions:
   - sts:GetCallerIdentity

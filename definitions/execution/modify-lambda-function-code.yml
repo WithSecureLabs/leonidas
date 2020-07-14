@@ -6,7 +6,7 @@ description: |
 platform: aws
 category: Execution
 mitre_ids:
-  - T1064
+  - T1059
 permissions:
   - lambda:UpdateFunctionCode
 input_arguments:

@@ -6,7 +6,7 @@ description: |
 platform: aws
 category: Defense Evasion
 mitre_ids:
-  - T1089
+  - T1562
 permissions:
   - cloudtrail:UpdateTrail
 input_arguments:

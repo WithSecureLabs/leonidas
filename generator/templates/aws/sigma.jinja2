@@ -15,7 +15,7 @@ detection:
   condition: selection_source AND events
 level: {{ detection["level"] }}
 {% if mitre_ids %}tags:
-  {% for id in mitre_ids %}- attack.t1089
+  {% for id in mitre_ids %}- attack.{{ id }}
   {% endfor %}{% endif %}
 {% if references %}references:{% for reference in references %}
   - {{ reference }}{% endfor %}{% endif %}
