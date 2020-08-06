@@ -5,6 +5,7 @@ Leo - case executor for Leonidas. Takes a config file as its first argument.
 """
 
 
+import datetime
 import json
 # import logging
 import sys
@@ -17,7 +18,7 @@ if __name__ == "__main__":
     config = yaml.safe_load(open(sys.argv[1], "r"))
     print("Url: {}".format(config["url"]))
     for case in config["cases"]:
-        print(config["cases"][case]["name"])
+        print("[{0} UTC] {1}".format(datetime.datetime.utcnow(), config["cases"][case]["name"]))
         url = config["url"] + config["cases"][case]["path"]
         headers = {}
         # if we're running Leonidas locally, no need for an API key, 
