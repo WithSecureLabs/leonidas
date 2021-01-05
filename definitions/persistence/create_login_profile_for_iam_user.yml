@@ -17,11 +17,11 @@ input_arguments:
   password:
     description: Password to configure for login profile
     type: str
-    value: "@#$%^&*()TestPass1234567890"
+    value: "TestPass1234567890"
 executors:
   sh:
     code: |
-      aws iam create-login-profile -user-name user -password password -no-password-reset-required
+      aws iam create-login-profile --user-name {{ user }} --password {{ password }} --no-password-reset-required
   leonidas_aws:
     implemented: True
     clients:
