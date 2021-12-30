@@ -27,3 +27,5 @@ detection:
       attributes:
         eventName: ListWebACLs
         eventSource: waf.amazonaws.com
+  falsepositives:
+    - Developers making legitimate changes to the environment. Verify whether the user identity, user agent, and/or hostname should be making changes in your environment. 
