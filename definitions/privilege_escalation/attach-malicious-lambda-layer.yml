@@ -1,0 +1,42 @@
+---
+name: Attach a Malicious Lambda Layer
+author: Nick Jones
+description: |
+   An attacker may attach a Lambda layer to an existing function to override a library that is used by the function, and use that malicious code to execute AWS API calls with that functions function's IAM role.
+platform: aws
+category: Privilege Escalation
+mitre_ids:
+  - T1525
+permissions:
+  - lambda:UpdateFunctionConfiguration
+input_arguments:
+  functionname:
+    description: Name of the function to be targeted
+    type: str
+    value: "example-function"
+  layers:
+    description: List of layers to add as space-separated ARNs
+    type: str
+    value: "arn:aws:lambda:us-east-1:123456789012:layer:my-layer"
+executors:
+  sh:
+    code: |
+      aws lambda update-function-configuration --function-name {{ functionname }} --layers {{ layers }}
+  leonidas_aws:
+    implemented: False
+    code: |
+      raise NotImplementedError
+detection:
+  sigma_id: 8fb105ea-19f8-4537-965a-cdc68200b8d9
+  status: experimental
+  level: medium
+  sources:
+    - name: cloudtrail
+      attributes:
+        eventName: UpdateFunctionConfiguration
+        eventSource: lambda.amazonaws.com
+  falsepositives:
+    - Developers making legitimate changes to the environment. Verify whether the user identity, user agent, and/or hostname should be making changes in your environment. 
+references:
+  - https://docs.aws.amazon.com/lambda/latest/dg/API_UpdateFunctionConfiguration.html
+  - https://docs.aws.amazon.com/cli/latest/reference/lambda/update-function-configuration.html
