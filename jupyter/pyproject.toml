@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "leonidas-jupyter"
+version = "0.1.0"
+description = ""
+authors = ["Nick Jones <nick.jones@f-secure.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+requests = "^2.28.2"
+pandas = "^1.5.3"
+jupyterlab = "^3.5.2"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

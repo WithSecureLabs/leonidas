@@ -3,7 +3,7 @@ import os
 
 class LeoCaseGen:
     """
-    Generates the Markdown documentation from the attack definitions
+    Generates the yaml config file for Leo
     """
 
     def __init__(self, config, env):

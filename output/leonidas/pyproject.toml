@@ -7,9 +7,9 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.7"
-flask = "^1.1.2"
-flask_restx = "^0.2.0"
-boto3 = "^1.13.22"
+flask = "^2.2.2"
+flask_restx = "^1.0.5"
+boto3 = "^1.26.60"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"
