@@ -16,11 +16,12 @@ custom:
 
 provider:
   name: aws
-  runtime: python3.7
+  runtime: python3.9
   stage: dev
   region: {{ region }}
-  apiKeys:
-    - apikey1
+  apiGateway:
+    apiKeys:
+      - apikey1
   iamManagedPolicies:
     - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
   iamRoleStatements:
