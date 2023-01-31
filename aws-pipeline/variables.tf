@@ -15,7 +15,7 @@ variable "environment" {
 
 variable "build_timeout" {
   description = "The time to wait for a CodeBuild to complete before timing out in minutes (default: 5)"
-  default     = "5"
+  default     = "10"
 }
 
 variable "build_compute_type" {
@@ -24,8 +24,8 @@ variable "build_compute_type" {
 }
 
 variable "build_image" {
-  description = "The build image for CodeBuild to use (default: aws/codebuild/standard:2.0)"
-  default     = "aws/codebuild/standard:2.0"
+  description = "The build image for CodeBuild to use (default: aws/codebuild/standard:6.0)"
+  default     = "aws/codebuild/standard:6.0"
 }
 
 variable "package_buildspec" {
