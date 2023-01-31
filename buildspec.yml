@@ -8,7 +8,7 @@ phases:
   install:
     runtime-versions:
       nodejs: 16
-      python: 3.7
+      python: 3.10
     commands:
       - npm install --global serverless
       - pip install poetry
