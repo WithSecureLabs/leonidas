@@ -17,7 +17,7 @@ input_arguments:
 executors:
   sh:
     code: |
-      aws iam delete-login-profile --user-name {{ user }}
+      aws iam delete-login-profile -user-name user
   leonidas_aws:
     implemented: True
     clients:
