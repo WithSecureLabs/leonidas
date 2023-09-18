@@ -21,7 +21,7 @@ input_arguments:
 executors:
   sh:
     code: |
-      aws iam update-login-profile -user-name user -password password -no-password-reset-required
+      aws iam update-login-profile --user-name {{ user }} --password {{ password }} -no-password-reset-required
   leonidas_aws:
     implemented: True
     clients:
