@@ -17,11 +17,12 @@ class LeoCaseGen:
         """
         cases = []
         for case in definitions.case_set:
-            if case["executors"]["leonidas_aws"]["implemented"]:
-                cutcase = {}
-                keylist = ["name", "input_arguments", "description", "category"]
-                cutcase = {key: value for key, value in case.items() if key in keylist}
-                cases.append(cutcase)
+            if case["platform"] == "aws":
+                if case["executors"]["leonidas_aws"]["implemented"]:
+                    cutcase = {}
+                    keylist = ["name", "input_arguments", "description", "category"]
+                    cutcase = {key: value for key, value in case.items() if key in keylist}
+                    cases.append(cutcase)
         if not os.path.exists(outdir):
             os.makedirs(outdir)
         with open(os.path.join(outdir, "caseconfig.yml"), "w") as outfile:

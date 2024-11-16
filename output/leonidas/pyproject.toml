@@ -1,12 +1,14 @@
 [tool.poetry]
 name = "leonidas"
-version = "0.1.0"
+version = "0.2.0"
 description = "Leonidas Attacker Action Executor"
-authors = ["Nick Jones <nick@nojones.net>"]
+authors = [
+    "Nick Jones <nick@nojones.net>",
+    "Leo Tsaousis"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 flask = "^2.2.2"
 flask_restx = "^1.0.5"
 boto3 = "^1.26.60"

@@ -1,14 +1,17 @@
 [tool.poetry]
 name = "leonidas-jupyter"
-version = "0.1.0"
+version = "0.2.0"
 description = ""
-authors = ["Nick Jones <nick.jones@f-secure.com>"]
+authors = [
+    "Nick Jones <nick@nojones.net>",
+    "Leo Tsaousis"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
 requests = "^2.31.0"
 pandas = "^1.5.3"
 jupyterlab = "^3.5.2"
+numpy = "1.26.4"
 
 [tool.poetry.dev-dependencies]
 

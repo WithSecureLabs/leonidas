@@ -1,8 +1,17 @@
 from datetime import date, datetime
+import base64
+import enum
 import json
+import os
+import re
+import subprocess
 import traceback
+
 import boto3
 
+import jinja2
+import werkzeug
+from flask_restx import reqparse
 
 class JSONEncoder(json.JSONEncoder):
     """
@@ -124,3 +133,100 @@ def get_client_accesskey(service, access_key_id, secret_access_key, region):
         aws_secret_access_key=secret_access_key,
         region_name=region
     )
+
+class ID_TYPE(enum.Enum):
+    ID_LEONIDAS   = 0
+    ID_SA         = 1
+    ID_USER       = 2
+
+class KubeCredentials:
+    """Class with utilities related to the processing of Kubernetes credentials supplied by the user"""
+    
+    def __init__(self, request):
+        self.CUSTOM_KUBECONFIG_PATH = "/tmp/custom-kubeconfig"
+        self.identity_to_use = ID_TYPE.ID_LEONIDAS
+        
+        self.token    = request.args.get("token")
+        self.tls_cert = request.args.get("tls_cert")
+        self.tls_key  = request.args.get("tls_key")
+
+        self.env = jinja2.Environment(
+            loader=jinja2.FileSystemLoader("api"),
+        ) 
+
+    def validate_creds(self):
+        """
+        Validates any Kubernetes credentials passed.
+        Decides the Identity that should be used.
+        Raises Exceptions if logic errors are found.
+        """
+        if not any([self.token, self.tls_cert, self.tls_key]):              # no cred passed : Leonidas ID
+            self.identity_to_use = ID_TYPE.ID_LEONIDAS
+            return
+        elif self.token:
+            if self.tls_cert or self.tls_key:                               # token & (cert | key) : Error
+                raise TypeError('Can only assume identity of service account or user, not both')
+            else:                                                           # just token : SA ID
+                # JWT input field validation
+                if not re.findall(r'(^eyJ[\w-]+\.eyJ[\w-]+\.[\w-]+$)',self.token):
+                    raise ValueError('Token provided in unexpected format')
+                self.identity_to_use = ID_TYPE.ID_SA
+                return
+        else:
+            if (bool(self.tls_cert) != bool(self.tls_key)):                 # no token & (cert ^ key) : Error
+                raise ValueError('Need both tls_cert and tls_key to assume user identity')
+            else:                                                           # no token & (cert & token) : User ID
+                self.identity_to_use = ID_TYPE.ID_USER
+        
+
+    def pass_creds(self, exec_code, phase, case):
+        """
+        Configures a temp kubeconfig & any custom credentials prior to kubectl execution, if a SA or User identity is assumed. 
+        Then wraps kubectl with a --kubeconfig pointing to the temp file for execution.
+        """
+        if self.identity_to_use == ID_TYPE.ID_LEONIDAS: # NOOP
+            return exec_code
+        else:
+            kubeconfig_tpl = self.env.get_template("kubeconfig.jinja2")
+            server="https://{}:{}".format(
+                os.environ["KUBERNETES_SERVICE_HOST"],
+                os.environ["KUBERNETES_SERVICE_PORT"] 
+            )
+            
+            if self.identity_to_use == ID_TYPE.ID_SA:
+                kubeconfig = kubeconfig_tpl.render(server=server, token="token: "+self.token )
+            
+            elif self.identity_to_use == ID_TYPE.ID_USER:
+                tmpname = (phase+'_'+case).lower()
+                self.tmpcert, self.tmpkey = '/tmp/'+tmpname+'.crt' , '/tmp/'+tmpname+'.key'
+                with open(self.tmpcert,'w') as c, open(self.tmpkey,'w')  as k:
+                    c.write(base64.b64decode(self.tls_cert).decode('utf-8'))
+                    k.write(base64.b64decode(self.tls_key).decode('utf-8'))
+                kubeconfig = kubeconfig_tpl.render(
+                    server=server, 
+                    cert="client-certificate: "+self.tmpcert, 
+                    key="client-key: "+self.tmpkey
+                )
+
+            with open(self.CUSTOM_KUBECONFIG_PATH, "w") as f:
+                f.write(kubeconfig)
+            return exec_code.replace('kubectl','kubectl --kubeconfig '+self.CUSTOM_KUBECONFIG_PATH)
+        
+    
+    def cleanup_creds(self):
+        """
+        Removes any test case credentials from the container's filesystem as well as the temp kubeconfig (reverting to in-cluster configuration) 
+        """
+        self.tls_cert = self.tls_key = self.token = None
+        if not self.identity_to_use == ID_TYPE.ID_LEONIDAS:
+            os.remove(self.CUSTOM_KUBECONFIG_PATH)
+            if self.identity_to_use == ID_TYPE.ID_USER:
+                os.remove(self.tmpcert), os.remove(self.tmpkey)
+            
+        
+class FileParser:  
+    parser = reqparse.RequestParser()
+    parser.add_argument('custom_yaml',  
+                        type=werkzeug.datastructures.FileStorage, 
+                        location='files',  
+                        help='YAML manifest')

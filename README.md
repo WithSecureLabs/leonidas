@@ -6,11 +6,16 @@ This is the repository containing Leonidas, a framework for executing attacker a
 * Sigma rules (https://github.com/Neo23x0/sigma) for detection
 * Documentation  - see http://detectioninthe.cloud/ for an example
 
-![Leonidas Architecture](./docs/architecture.png?raw=true "Leonidas Architecture")
+The project was originally designed for use in AWS environments, with the following architecture:
+
+![Leonidas Architecture](./docs/architecture.png)
+In 2024, Leonidas was extended to support Kubernetes environments. Its resources can be deployed within the target cluster, as per the following architecture:
+![Leonidas K8S Architecture](./docs/k8s-architecture.png)
 
 ## Deploying the API
 
-The API is deployed via an AWS-native CI/CD pipeline. Instructions for this can be found at [Deploying Leonidas](./docs/deploying-leonidas.md).
+The API is deployed into an AWS account via an AWS-native CI/CD pipeline, and into a Kubernetes cluster using auto-generated YAML manifests.
+Instructions for both environments can be found at [Deploying Leonidas](./docs/deploying-leonidas.md).
 
 ## Using the API
 
@@ -39,10 +44,10 @@ The documentation is generated as follows:
 
 This will produce markdown versions of the documentation available at `output/docs`. This can be uploaded to an existing markdown-based documentation system, or the following can be used to create a prettified HTML version of the docs:
 
-* `cd output`
+* `cd ../output`
 * `mkdocs build`
 
-This will create a `output/site` folder containing the HTML site. It is also possible to view this locally by running `mkdocs serve` in the same folder.
+This will create an `output/site` folder containing the HTML site. It is also possible to view this locally by running `mkdocs serve` in the same folder.
 
 ## Writing Definitions
 
@@ -85,6 +90,10 @@ detection:
 ## Credits
 
 Project built and maintained by Nick Jones ( [NJonesUK](https://github.com/NJonesUK) / [@nojonesuk](https://twitter.com/nojonesuk)).
+
+Kubernetes support added by Leo Tsaousis ( [@laripping](https://github.com/LAripping) ).
+
+Special thanks also to Mohit Gupta ( @[Skybound1](https://github.com/Skybound1) ) for his invaluable contribution.
 
 This project drew ideas and inspiration from a range of sources, including:
 

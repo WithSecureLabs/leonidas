@@ -1,0 +1,57 @@
+---
+name: Sidecar Injection
+author: Leo Tsaousis
+category: "Execution"
+description: |
+  Inject a sidecar container into a running deployment 
+  
+  A sidecar container is an additional container that resides alongside the main container within the pod. Containers can be added to running resources like Deployments/DeamonSets/StatefulSets by means of "kubectl patch". By injecting a new container within a legitimate pod attackers can run their code and hide their activity, instead of running their own separated pod in the cluster.
+mitre_ids:
+  - T609
+platform: kubernetes
+permissions:
+  - namespaced: true
+    apiGroups: 
+    - apps
+    resources: 
+    - deployments
+    verbs: 
+    - get
+    - patch
+input_arguments:
+  deployment:
+    description: Name of the deployment to patch
+    type: str
+    value: "patchable-deployment"
+  custom_yaml:
+    type: file
+    description: YAML definition of the container template that will be patched into the deployment
+    value:
+      spec:
+        template:
+          spec:
+            containers:
+            - name: injected-sidecar
+              image: skybound/net-utils
+              command:
+              - sleep
+              - "3600"
+executors:
+  sh:
+    code: |
+      kubectl patch deployment {{ deployment }} --patch-file /tmp/custom.yml
+  leonidas_kube:
+    implemented: True
+detection:
+  level: low
+  sigma_id: ad9012a6-e518-4432-9890-f3b82b8fc71f
+  status: experimental
+  sources: 
+  - name: audit
+    attributes: 
+      apiGroup: apps
+      resource: deployments
+      verb: patch  
+references:
+  - https://kubernetes.io/docs/tasks/manage-kubernetes-objects/update-api-object-kubectl-patch
+  - https://microsoft.github.io/Threat-Matrix-for-Kubernetes/techniques/Sidecar%20Injection/

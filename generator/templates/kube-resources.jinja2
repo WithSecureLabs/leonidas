@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: leonidas-deployment
+  namespace: {{ namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: leonidas
+  template:
+    metadata:
+      labels:
+        app: leonidas
+    spec:
+      serviceAccount: leonidas-sa
+      volumes:
+      - name: varlog
+        emptyDir: {}
+      containers:
+      - name: leonidas-container
+        image: {{ image_url }}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+          name: flask-port
+        volumeMounts:
+        - name: varlog
+          mountPath: /var/log
+      - name: log-sidecar
+        image: busybox:1.28
+        args: [/bin/sh, -c, 'tail -n+1 -F /var/log/leonidas-flask.log']
+        volumeMounts:
+        - name: varlog
+          mountPath: /var/log
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: {{ namespace }}
+  name: leonidas-sa
+---
+kind: {% if is_namespaced %}RoleBinding{% else %}ClusterRoleBinding{% endif %}
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: leonidas-{% if is_namespaced %}role{% else %}clusterrole{% endif %}binding
+  {% if is_namespaced %}namespace: {{ namespace }}{% endif %}
+subjects:
+- kind: ServiceAccount
+  name: leonidas-sa
+  namespace: {{ namespace }}
+roleRef: 
+  kind: {% if is_namespaced %}Role{% else %}ClusterRole{% endif %}
+  name: leonidas-{% if is_namespaced %}role{% else %}clusterrole{% endif %}
+  apiGroup: ""
+---

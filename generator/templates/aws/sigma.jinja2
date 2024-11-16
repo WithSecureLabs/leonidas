@@ -12,10 +12,12 @@ detection:
     - eventSource: "{{ detection["sources"][0]["attributes"]["eventSource"] }}"
   events:
     - eventName: "{{ detection["sources"][0]["attributes"]["eventName"] }}"
-  condition: selection_source AND events
+  condition: selection_source and events
 level: {{ detection["level"] }}
 {% if mitre_ids %}tags:
   {% for id in mitre_ids %}- attack.{{ id }}
   {% endfor %}{% endif %}
 {% if references %}references:{% for reference in references %}
   - {{ reference }}{% endfor %}{% endif %}
+{% if detection.falsepositives %}falsepositives:{% for fp in detection.falsepositives %}
+  - {{ fp }}{% endfor %}{% endif %}

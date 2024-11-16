@@ -1,0 +1,38 @@
+---
+name: Delete pod 
+author: Leo Tsaousis
+category: "Impact"
+description: |
+  Remove a pod from a cluster to impact business operations
+mitre_ids:
+  - T1498
+platform: kubernetes
+permissions:
+  - namespaced: true
+    apiGroups: [""] 
+    resources:
+    - pods
+    verbs: 
+    - delete
+input_arguments:
+  podname:
+    description: Name of the pod to remove
+    type: str
+    value: "leonidas-netutils-pod"
+executors:
+  sh:
+    code: |
+      kubectl delete pod {{ podname }}
+  leonidas_kube:
+    implemented: True
+detection:
+  sigma_id: 40967487-139b-4811-81d9-c9767a92aa5a
+  status: experimental
+  level: low
+  sources: 
+  - name: audit
+    attributes: 
+      resource: pods
+      verb: delete 
+references: 
+- https://microsoft.github.io/Threat-Matrix-for-Kubernetes/techniques/Data%20destruction/

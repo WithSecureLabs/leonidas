@@ -1,0 +1,43 @@
+---
+name: Delete deployment 
+author: Leo Tsaousis
+category: "Impact"
+description: |
+  Remove a deployment to impact business operations. 
+
+  The availability features of Kubernetes guarantee that workloads managed by collections such as Deployments or DaemonSets, will be automatically re-scheduled if terminated or deleted. Therefore, removing managed Pods will only incur temporary disruption. Determined actors aiming to cause Denial of Service will instead aim for controller objects like Deployments.
+mitre_ids:
+  - T1485
+  - MS-TA9038
+platform: kubernetes
+permissions:
+  - namespaced: true
+    apiGroups:
+    - apps
+    resources:
+    - deployments
+    verbs: 
+    - delete
+input_arguments:
+  deploymentname:
+    description: Name of the deployment to remove
+    type: str
+    value: "leonidas-netutils-deployment"
+executors:
+  sh:
+    code: |
+      kubectl delete deployment {{ deploymentname }}
+  leonidas_kube:
+    implemented: True
+detection:
+  sigma_id: 96047487-319b-4811-81d9-b9767a92aa5d
+  status: experimental
+  level: medium
+  sources: 
+  - name: audit
+    attributes: 
+      resource: deployments
+      verb: delete 
+references: 
+- https://microsoft.github.io/Threat-Matrix-for-Kubernetes/techniques/Data%20destruction/
+- https://www.crowdstrike.com/blog/crowdstrike-discovers-first-ever-dero-cryptojacking-campaign-targeting-kubernetes/ 

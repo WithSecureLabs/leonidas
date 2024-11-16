@@ -19,7 +19,7 @@ input_arguments:
     value: ExamplePolicy
   policydocument:
     description: file of new inline policy to set
-    type: file
+    type: str
     value: file://examplepolicy.json
 executors:
   sh:

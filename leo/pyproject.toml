@@ -1,8 +1,10 @@
 [tool.poetry]
 name = "leo"
-version = "0.1.0"
+version = "0.2.0"
 description = ""
-authors = ["Nick Jones <nick.jones@f-secure.com>"]
+authors = [
+    "Nick Jones <nick@nojones.net>",
+    "Leo Tsaousis"]
 
 [tool.poetry.dependencies]
 python = "^3.7"

@@ -1,0 +1,36 @@
+name: List Own Permissions
+author: Leo Tsaousis
+category: "Discovery"
+description: |
+  List the RBAC permissions assigned to the current entity
+
+  In the early stages of a breach attackers will aim to list the permissions they have within the compromised environment. In a Kubernetes cluster, this can be achieved by interacting with the SelfSubjectAccessReview API, e.g. via "kubectl auth" command. This will enumerate the Role-Based Access Controls (RBAC) rules defining the compromised user's authorization.  
+mitre_ids:
+  - T1069.003
+  - T1087.004
+platform: kubernetes
+permissions:
+  - namespaced: true
+    apiGroups: 
+    - authorization.k8s.io 
+    resources: 
+    - selfsubjectrulesreviews
+    verbs: 
+    - create
+input_arguments:
+executors:
+  sh:
+    code: |
+      kubectl auth can-i --list
+  leonidas_kube:
+    implemented: True
+detection:
+  sigma_id: 84b777bd-c946-4d17-aa2e-c39f5a454325
+  status: experimental
+  level: low
+  sources: 
+  - name: audit
+    attributes: 
+      apiGroup: authorization.k8s.io
+      resource: selfsubjectrulesreviews
+      verb: create

@@ -1,0 +1,39 @@
+---
+name: Access Application Credentials from ConfigMaps
+author: Leo Tsaousis
+category: "Credential Access"
+description: |
+  Attempt to Access Application Credentials by listing ConfigMaps 
+
+  Despite this being a bad practice, Developers sometimes store secrets in the Kubernetes configuration files, such as environment variables in the pod configuration. Access to those configurations can be obtained by querying the API server.
+
+  This test case only simulates a standard "list" operation, although the same result can also be achieved with a "watch" operation. The associated detection shall therefore not be considered complete, but only a 1-to-1 match of this particular test case.
+mitre_ids:
+  - T1552.007
+platform: kubernetes
+permissions:
+  - namespaced: true
+    apiGroups: [""]
+    resources: 
+    - configmaps
+    verbs: 
+    - list
+input_arguments:
+executors:
+  sh:
+    code: |
+      kubectl get configmaps
+  leonidas_kube:
+    implemented: True
+detection:
+  sigma_id: 8235adde-cbe2-4cc0-a34d-1e8f0f068e48
+  status: experimental
+  level: low
+  sources: 
+  - name: audit
+    attributes: 
+      apiGroup: ""
+      resource: configmaps
+      verb: list
+references: 
+- https://microsoft.github.io/Threat-Matrix-for-Kubernetes/techniques/Application%20credentials%20in%20configuration%20files/
