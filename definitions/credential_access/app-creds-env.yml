@@ -1,0 +1,41 @@
+---
+name: Application Credentials from Environment Variables
+author: Leo Tsaousis
+category: "Credential Access"
+description: |
+  Attempt to Access Application Credentials in Environmemt Variables 
+
+  Developers store secrets in the Kubernetes configuration files, such as environment variables in the pod configuration. These variables can be listed within the description of pods.
+
+  This test case only simulates a standard "list" operation, although the same result can also be achieved with a  "watch" operation. The associated detection shall therefore not be considered complete, but only a 1-to-1 match of this particular test case.
+mitre_ids:
+  - T1552.007
+platform: kubernetes
+permissions:
+  - namespaced: true
+    apiGroups: [""]
+    resources: 
+    - pods
+    verbs: 
+    - list
+input_arguments:
+executors:
+  sh:
+    code: |
+      kubectl get pods -o=jsonpath="{.items[*].spec.containers[*].env}"
+  leonidas_kube:
+    implemented: True
+detection:
+  sigma_id: ec8ec8b1-c696-4e9a-ae20-8e1c1f056b09
+  status: experimental
+  level: low
+  sources: 
+  - name: audit
+    attributes: 
+      apiGroup: ""
+      resource: pods
+      verb: list
+  falsepositives:
+    - get pods might be performed for various legitimate reasons. Stronger detections could be based on a correlation search for subsequent activity making use of environment variables  
+references: 
+- https://microsoft.github.io/Threat-Matrix-for-Kubernetes/techniques/Application%20credentials%20in%20configuration%20files/

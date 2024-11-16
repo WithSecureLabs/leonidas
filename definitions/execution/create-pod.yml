@@ -1,0 +1,51 @@
+---
+name: Create pod
+author: Leo Tsaousis
+category: "Execution"
+description: |
+  Deploy a malicious container. 
+  
+  For this test case, the example image for the rogue container is fetched from a public repository, however rogue containers may use existing images for alternative purposes. 
+mitre_ids:
+  - T1204.003
+  - T1578.002
+platform: kubernetes
+permissions:
+  - namespaced: true
+    apiGroups: [""] 
+    resources:
+    - pods
+    verbs: 
+    - create
+input_arguments:
+  podname:
+    description: Name of the pod to be created
+    type: str
+    value: "leonidas-netutils-pod"
+  imagename:
+    description: Name of the image to be used
+    type: str
+    value: "skybound/net-utils"
+  command:
+    description: Command to execute within the new pod
+    type: str
+    value: "sleep 3600"
+executors:
+  sh:
+    code: |
+      kubectl run {{ podname }} --image {{ imagename }} --command -- {{ command }}
+  leonidas_kube:
+    implemented: True
+detection:
+  sigma_id: 3c23ed24-51d0-4e29-bfa7-4ad26eaa27cd
+  status: experimental
+  level: low
+  sources: 
+  - name: audit
+    attributes: 
+      apiGroup: ""
+      resource: pods
+      subresource: ""
+      verb: create
+references: 
+- https://microsoft.github.io/Threat-Matrix-for-Kubernetes/techniques/New%20Container/

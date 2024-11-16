@@ -1,0 +1,69 @@
+name: Mapping of Kubernetes test cases for ELK's default Kubernetes integration
+priority: 30
+transformations:
+
+# Step 1 - checks for performance 
+
+- id: index_condition
+  type: add_condition
+  # only search upon Kubernetes audit logs
+  conditions:
+    kubernetes.audit.kind: Event
+  # only transform fields if this is a Kubernetes rule
+  rule_conditions:
+  - type: logsource
+    product: kubernetes
+
+# Step 2 - the transformations
+
+
+# Map simplified Sigma fields to the names ELK assigns them
+- id: field_mapping
+  type: field_name_mapping
+  mapping:
+    verb: 
+    - kubernetes.audit.verb
+    apiGroup:
+    - kubernetes.audit.objectRef.apiGroup
+    resource:
+    - kubernetes.audit.objectRef.resource
+    subresource:
+    - kubernetes.audit.objectRef.subresource
+    namespace:
+    - kubernetes.audit.objectRef.namespace
+    capabilities:
+    - kubernetes.audit.requestObject.spec.containers.securityContext.capabilities.add
+    hostPath:
+    - kubernetes.audit.requestObject.spec.volumes.hostPath
+
+# If apiGroup is "" OR omitted, then drop from query, as the ELK Kubernetes integration doesn't set this event field when apiGroup is the default
+- id: drop_default_apigroup
+  type: drop_detection_item
+  field_name_conditions:
+  - type: include_fields
+    fields:
+    - apiGroup
+    - kubernetes.audit.objectRef.apiGroup
+  detection_item_conditions:
+  - type: match_string
+    cond: any
+    pattern: "^$"
+
+# If subresource is "" OR omitted, then drop from query, as the ELK Kubernetes integration doesn't set this event field for resource-only endpoints
+- id: drop_empty_subresource
+  type: drop_detection_item
+  field_name_conditions:
+  - type: include_fields
+    fields:
+    - subresource
+    - kubernetes.audit.objectRef.subresource
+  detection_item_conditions:
+  - type: match_string
+    cond: any
+    pattern: "^$"
+
+
+
+
+    
+  

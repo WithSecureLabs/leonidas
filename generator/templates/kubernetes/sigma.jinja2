@@ -1,0 +1,34 @@
+---
+title: {{ name }}
+id: {{ detection.sigma_id }}
+status: {{ detection.status }}
+author: {{ author }}
+date: {{ last_modified }}
+description: |
+  {{ description | trim | indent(2) }}
+logsource:
+  product: kubernetes
+  service: {{ detection.sources[0]["name"] }}
+detection:
+  selection:
+    verb: {{ detection["sources"][0]["attributes"]["verb"] }}
+    {% if detection["sources"][0]["attributes"]["apiGroup"] %}apiGroup: {{ detection["sources"][0]["attributes"]["apiGroup"] }}{%- endif %}
+    resource: {{ detection["sources"][0]["attributes"]["resource"] }}
+    {% if detection["sources"][0]["attributes"]["subresource"] -%}
+    subresource: {{ detection["sources"][0]["attributes"]["subresource"] }}{%- endif -%}
+    {%- if detection["sources"][0]["attributes"]["namespace"] -%}
+    namespace: {{ detection["sources"][0]["attributes"]["namespace"] }}{%- endif -%}
+    {%- if detection["sources"][0]["attributes"]["capabilities"] -%}
+    capabilities: "{{ detection["sources"][0]["attributes"]["capabilities"] }}"{%- endif -%}
+    {%- if detection["sources"][0]["attributes"]["hostPath"] -%}
+    hostPath: "{{ detection["sources"][0]["attributes"]["hostPath"] }}"{%- endif %}
+  condition: selection
+level: {{ detection["level"] }}
+{% if mitre_ids %}tags:
+{%- for id in mitre_ids %}
+- attack.{{ id }}
+{%- endfor %}{%- endif %}
+{% if references %}references:{% for reference in references %}
+- {{ reference }}{% endfor %}{% endif %}
+{% if detection.falsepositives %}falsepositives:{% for fp in detection.falsepositives %}
+- {{ fp }}{% endfor %}{% endif %}

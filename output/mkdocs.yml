@@ -1,7 +1,7 @@
 site_name: Leonidas Test Case Documentation
 site_url: http://detectioninthe.cloud
 site_description: Documentation on the cloud attack detection test cases defined as part of Leonidas
-copyright: Copyright 2020 F-Secure
+copyright: Copyright 2024 WithSecure Consulting
 theme:
   name: material
   icon:
@@ -13,6 +13,6 @@ markdown_extensions:
 extra:
   social:
     - icon: fontawesome/brands/github-alt
-      link: https://github.com/fsecurelabs
-    - icon: fontawesome/brands/twitter
-      link: https://twitter.com/fsecurelabs
+      link: https://github.com/WithSecureLabs
+    - icon: fontawesome/brands/x-twitter
+      link: https://x.com/withconsulting

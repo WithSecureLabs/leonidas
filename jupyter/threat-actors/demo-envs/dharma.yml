@@ -1,0 +1,108 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: dharma-prod
+---
+kind: CertificateSigningRequest
+apiVersion: certificates.k8s.io/v1
+metadata:
+  name: jlocke-csr
+  namespace: dharma-prod
+spec:
+  groups:
+  - system:authenticated
+  signerName: kubernetes.io/kube-apiserver-client
+  request: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0KTUlJQ1ZqQ0NBVDRDQVFBd0VURVBNQTBHQTFVRUF3d0dhbXh2WTJ0bE1JSUJJakFOQmdrcWhraUc5dzBCQVFFRgpBQU9DQVE4QU1JSUJDZ0tDQVFFQS9QcW1PQTRaS1hqUnNESWpQOWZmK2JtcnhEOFpJK1pKdDkwRk5TcDg5R0F3CnRXRVBvanFkazVFWGFpaWsxcWRnSVpTUXlxR2NscThSd2VjY2pwOTNTQXJLajBLNHF3UlZ3aDNGT3VUWWlEV1UKckVkekZMcmJheUQ1dlJ3OXlGbHJBMXNETmVPS3cyY0lPUHBacGUwbHdOdGxjcTVXNlZGMlZhamNVUEJpUG1yZwpkU2NLeGlXQ3Y5L3dwOVRWOVJvR0N4WFlPWEZlN1NlaHhiWGgwcC92cDlIUmo3UDB4UWpqL0hCYUZZc004dDBICkRXZlUvZDErcVQrOEFXa1hIbjRXdUVESDBUU1YvbmZqSENOaWhuQi9yb2ltUFhrd1lXSHduSG9qeHZWNkdhRVYKeHRHSEtGdzBFdmRSRXB6UGJ6MjRBS1VpYXpySjkrakhrV3M1dHNOVW1RSURBUUFCb0FBd0RRWUpLb1pJaHZjTgpBUUVMQlFBRGdnRUJBQ1J6azVNci9RVjczUFFqekVoREtIbU5lODZiRVNLM3JCd0RNZzhMdzZ0SE13QzNqT2w1ClFPRVp0WVZEU1pOM2NLWlNPTFd6bzJsVzIxT3U0bmNHSWVHQ05sVnFmazhPaU53S09YZit5bFRXdktzV2t6K2YKaUo1TTBSNFdnbm1lS2p2UnlGOUI3UndBWThHVGtRNjlOd1ZnTFVIMjZBUzcyUnVCK25Ka2xrVkJ1N0d1UHhEQQpPWnpXYzlvMy8wZ1dTUjRWM0d4RFFrdHpORCtrNXB5VXBMdjVQVnhrOXllMFY5cmRnUjRNQ3NuWXdPYW5kaFpaCnJuMEVNaFI0UFA0cHRKcko3cy9ETUZLaXllNDhCVVBBZTNqa3dVRFRpTWEzdVVDUVQzcHQrR1RTZnJZSzBndVgKWjlvRWtBQk5GYjhCdmUxNTBNR1MwVnh1d3FUdU0rdUJyVlU9Ci0tLS0tRU5EIENFUlRJRklDQVRFIFJFUVVFU1QtLS0tLQo=
+  usages:
+  - digital signature
+  - key encipherment
+  - client auth
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: lamppost-sa
+  namespace: dharma-prod
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: dharma-prod
+  name: lamppost-sa-secret
+  annotations:
+    kubernetes.io/service-account.name: lamppost-sa
+type: kubernetes.io/service-account-token
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: dharma-prod
+  name: jlocke-role
+rules:
+  - apiGroups: [""]
+    resources: ["pods","pods/exec", "secrets"]
+    verbs: ["get", "list", "create", "update", "delete", "exec", "watch", "patch", "edit"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: dharma-prod
+  name: lamppost-rb
+subjects:
+  - kind: ServiceAccount
+    name: lamppost-sa
+    apiGroup: ""
+roleRef:
+  kind: Role
+  name: jlocke-role
+  apiGroup: ""
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: dharma-prod
+  name: jlocke-rb
+subjects:
+  - kind: User
+    name: jlocke
+    apiGroup: ""
+roleRef:
+  kind: Role
+  name: jlocke-role
+  apiGroup: ""
+---
+kind: Secret
+apiVersion: v1
+metadata:
+  name: patient-db-creds
+  namespace: dharma-prod
+data:
+  root-password: VkFMM05aMzc3MQ==
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  namespace: dharma-prod
+  name: patient-db
+spec:
+  containers:
+  - image: mysql:5.6
+    name: mysql
+    env:
+      - name: MYSQL_ROOT_PASSWORD
+        valueFrom: 
+          secretKeyRef:
+            name: patient-db-creds
+            key: root-password
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  namespace: dharma-prod
+  name: hvac-controller
+spec:
+  containers:
+  - image: library/gcc
+    name: libc
+    command: ["/bin/sh", "-c", "sleep infinity"]
+---

@@ -1,8 +1,13 @@
 ---
-# Folder to load leonidas definitions from
+# Directory to load leonidas definitions from
 definitions_path: ../definitions
 # Directory to use for output
 output_dir: ../output
-region: us-east-1
+region: eu-west-2
 resources:
   - "\"*\""
+# Kubernetes namespace to generate role into (if not specified the "default" namespace is used)
+namespace: target-namespace
+# Image registry to push & pull the image
+image_url: ttl.sh/leonidas:15m
+

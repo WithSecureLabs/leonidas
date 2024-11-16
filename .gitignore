@@ -1,5 +1,7 @@
 output/*
 .vscode/*
+.idea/*
+.obsidian/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -148,6 +150,7 @@ cython_debug/
 # .tfstate files
 *.tfstate
 *.tfstate.*
+*lock.hcl
 
 # Crash log files
 crash.log
@@ -175,3 +178,5 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+test-files/

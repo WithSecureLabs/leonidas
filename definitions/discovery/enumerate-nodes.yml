@@ -1,0 +1,38 @@
+---
+name: Enumerate nodes
+author: Leo Tsaousis
+category: "Discovery"
+description: |
+  Enumerate nodes within a cluster 
+
+  This test case only simulates a standard "list" verb, although the same result can also be achieved with a "watch" operation. The associated detection shall therefore not be considered complete, but only a 1-to-1 match of this particular test case. 
+mitre_ids:
+  - T1580
+  - T1613
+platform: kubernetes
+permissions:
+  - namespaced: false
+    apiGroups: [""] # "" indicates the core API group
+    resources:
+    - nodes
+    verbs: 
+    - list  
+input_arguments:
+executors:
+  sh:
+    code: |
+      kubectl get nodes
+  leonidas_kube:
+    implemented: True
+detection:
+  sigma_id: 7609f875-66d0-445e-ab16-8b3e53b1edc9
+  status: experimental
+  level: low
+  sources: 
+  - name: audit
+    attributes: 
+      apiGroup: ""
+      resource: nodes
+      verb: list
+  falsepositives:
+    - Legitimate administrative activity. Investigate for similar activity from the same identity that could indicate enumeration attempts

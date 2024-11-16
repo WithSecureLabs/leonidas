@@ -31,7 +31,7 @@ class SigmaExport:
                     sigma_cases[category][case["name"]] = case
 
             for technique in sigma_cases[category]:
-                sigma_filename = technique.replace(" ", "_").lower() + ".yaml"
+                sigma_filename = technique.replace(" ", "_").lower() + ".yml"
                 filename = os.path.join(cat_outdir, sigma_filename)
                 with open(filename, "w") as sigmaoutfile:
                     sigmaoutfile.write(sigma_cases[category][technique]["sigma"])

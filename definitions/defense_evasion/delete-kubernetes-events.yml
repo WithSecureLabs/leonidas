@@ -1,0 +1,36 @@
+---
+name: Delete Events
+author: Leo Tsaousis
+category: "Defense Evasion"
+description: |
+  Delete all Kubernetes events within a namespace
+mitre_ids:
+  - T1070
+platform: kubernetes
+permissions:
+  - namespaced: true
+    apiGroups: [""] 
+    resources:
+    - events
+    verbs: 
+    - delete
+    - list
+input_arguments:
+executors:
+  sh:
+    code: |
+      kubectl delete events --all
+  leonidas_kube:
+    implemented: True
+detection:
+  sigma_id: 3132570d-cab2-4561-9ea6-1743644b2290
+  status: experimental
+  level: medium
+  sources: 
+  - name: audit
+    attributes: 
+      apiGroup: ""
+      resource: events
+      verb: delete 
+references: 
+- https://microsoft.github.io/Threat-Matrix-for-Kubernetes/techniques/Delete%20K8S%20events/

@@ -1,0 +1,35 @@
+---
+name: Enumerate pods
+author: Leo Tsaousis
+category: "Discovery"
+description: |
+  Enumerate pods within the Leonidas namepsace
+mitre_ids:
+  - T1580
+  - T1613
+platform: kubernetes
+permissions:
+  - namespaced: true
+    apiGroups: [""] # "" indicates the core API group
+    resources:
+      - pods
+    verbs: 
+      - list  
+input_arguments:
+executors:
+  sh:
+    code: |
+      kubectl get pods
+  leonidas_kube:
+    implemented: True
+detection:
+  sigma_id: 18490e7b-f1f3-484a-806b-4cb16aa225ce
+  status: experimental
+  level: low
+  sources: 
+    - name: audit
+      attributes: 
+        resource: pods
+        verb: list
+  falsepositives:
+    - Legitimate administrative activity. Investigate for similar activity from the same identity that could indicate enumeration attempts

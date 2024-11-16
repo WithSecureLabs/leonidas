@@ -17,7 +17,7 @@ resource "aws_iam_role" "codepipeline_role" {
 
 # CodePipeline policy needed to use CodeCommit and CodeBuild
 resource "aws_iam_role_policy" "attach_codepipeline_policy" {
-  name = "odepipeline-policy"
+  name = "codepipeline-policy"
   role = aws_iam_role.codepipeline_role.id
 
   policy = <<EOF

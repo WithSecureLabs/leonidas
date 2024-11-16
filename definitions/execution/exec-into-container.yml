@@ -1,0 +1,53 @@
+---
+name: Exec into Container
+author: Leo Tsaousis
+category: "Execution"
+description: |
+  Execute into a Pod's container
+  
+  Attackers who have permissions, can run malicious commands in a Pod's container within the cluster using "kubectl exec" command
+mitre_ids:
+  - T1609
+platform: kubernetes
+permissions:
+  - namespaced: true
+    apiGroups: [""]
+    resources: 
+      - pods/exec
+    verbs: 
+      - create
+  - namespaced: true
+    apiGroups: [""]
+    resources: 
+      - pods
+    verbs: 
+      - get
+input_arguments:
+  podname:
+    description: Name of the pod to exec into
+    type: str
+    value: "vulnerable-pod"
+  command:
+    description: The command to execute within the pod. 
+    type: str
+    value: "whoami"
+executors:
+  sh:
+    code: | 
+      kubectl exec {{ podname }} -- sh -c {{ command }}
+  leonidas_kube:
+    implemented: True
+detection:
+  sigma_id: a1b0ca4e-7835-413e-8471-3ff2b8a66be6
+  status: experimental
+  level: low
+  sources: 
+  - name: audit
+    attributes: 
+      verb: create
+      resource: pods
+      subresource: exec
+  falsepositives:
+    - Legitimate debugging activity, investigate the identity performing the requests and their authorization  
+references: 
+- https://microsoft.github.io/Threat-Matrix-for-Kubernetes/techniques/Exec%20into%20container/

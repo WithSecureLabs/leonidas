@@ -1,0 +1,98 @@
+import datetime
+import json
+import subprocess
+from flask import request
+from flask_restx import Resource, Namespace
+from .api_base import api, app
+from .utils import json_serial, KubeCredentials, FileParser
+from string import Template
+from shlex import quote
+import os
+import logging
+from os.path import splitext, basename
+
+YAML_PATH = '/tmp/custom.yml'
+
+{% for case in cases %}
+class {{ case['name']|title|replace(" ", "")|replace("-", "") }}(Resource):
+    """
+    API Class for {{ case['name'] }}
+    """
+    {% if case['takes_file'] %}@api.expect(FileParser.parser){% endif %}
+    @api.doc(params={ {% if case['input_arguments'] %}{% for arg, contents in case['input_arguments'].items() %}
+        '{{ arg }}': '{{ contents['description'] }}', {% endfor %}{% endif %}
+        'token':    'JWT token of a serviceaccount to execute the test case as',
+        'tls_cert': 'Base64 encoded TLS certificate of a user to execute the test case as. Needs tls_key',
+        'tls_key':  'Base64 encoded TLS private key of a user to execute the test case as. Needs tls_cert' 
+        }
+    )
+    {% if case['takes_file'] %}def put(self):{% elif case['input_arguments'] %}def post(self):{% else %}def get(self):{% endif %}
+        """
+        {{ case['description']|wordwrap|indent }}
+        """
+        {% if case['input_arguments'] %}{% for arg, contents in case['input_arguments'].items() %}{{ arg }} = request.args.get("{{ arg }}") or {% if "str" in contents['type'] %}"{{ contents['value'] }}"{% else %}{{ contents['value'] }}{% endif %}
+        {% endfor %}{% endif %}
+        
+        {% if case['takes_file'] %}args = FileParser.parser.parse_args()
+        if args['custom_yaml']:
+            custom_yaml = args['custom_yaml'].read().decode('utf-8')
+        else:
+            custom_yaml = """{{ case["file_default_yaml"] }}"""
+            
+        with open(YAML_PATH,'w') as tmpyml:
+            tmpyml.write(custom_yaml)
+        {% endif %}
+        try:
+            # this "rendered" code is generated in generator/lib/definitions.py:_generate_kube_code()
+            # it is just shell command(s) - here we wrap it around python code that suprocess.run()'s it 
+            # and we collect stdout,stderr,retcode to store in the "result" dict
+            
+            kubecreds = KubeCredentials(request)
+            kubecreds.validate_creds()
+
+            t = Template({{ case["executors"]["leonidas_kube"]["rendered"] | escape_shell }})
+            exec_code =  t.substitute(
+                {% if case['input_arguments'] %}{% for arg, contents in case['input_arguments'].items() %}{{ arg }} = quote({{ arg }}),
+                {% endfor %}{% endif %}
+            )
+            exec_code = kubecreds.pass_creds(
+                exec_code,
+                splitext(basename(__file__))[0],
+                __class__.__name__
+            )
+                        
+            proc = subprocess.run(exec_code, shell=True, capture_output=True, timeout=30)
+            result = {}
+            result["shell"]  = exec_code
+            result["stdout"] = proc.stdout.decode('utf-8')
+            result["stderr"] = proc.stderr.decode('utf-8')
+            result["exit_code"] = proc.returncode
+
+                         
+        except Exception as excpt:
+            result = excpt
+        finally:
+            kubecreds.cleanup_creds()   
+            {% if case['takes_file'] %}os.remove(YAML_PATH){% endif %}
+        
+        event_dict = {
+            "request": {
+                "usecase": request.path,
+                "args": request.args,
+                "timestamp": datetime.datetime.now(tz=datetime.timezone.utc),
+            },
+            "response": result
+        }
+        event_logger = logging.getLogger("events")
+        event_logger.info(json.dumps(event_dict, default=json_serial))  
+        return result                                       
+{% endfor %}
+
+ns = Namespace('{{ category }}', description='{{ category|replace('_', ' ')|title }}')
+
+{% for case in cases %}
+ns.add_resource({{ case['name']|title|replace(" ", "")|replace("-", "") }}, '/{{ case['name']|replace(" ", "_")|replace("-", "")|lower }}'){% endfor %}
+api.add_namespace(ns)
+
+if __name__ == "__main__":
+    app.run(debug=False)

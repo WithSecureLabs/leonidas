@@ -1,0 +1,40 @@
+---
+name: Pod Name Similarity 
+author: Leo Tsaousis
+category: "Defense Evasion"
+description: |
+  Deploy a backdoor container named to imitate system pods. 
+  
+  System pods, created by controllers such as Deployments or DaemonSets have random suffixes in their names. Attackers can use this fact and name their backdoor pods as if they were created by the existing controllers to avoid detection. This can be attempted in the kube-system namespace alongside the other administrative containers.
+
+  This test case creates pod imitating kube-proxy within the kube-system namespace, which is however based on a public image.
+mitre_ids:
+- T1036.005
+platform: kubernetes
+permissions:
+- namespaced: false
+  apiGroups: [""] 
+  resources:
+  - pods
+  verbs: 
+  - create
+input_arguments:
+executors:
+  sh:
+    code: |
+      kubectl -n kube-system run kube-proxy-bv61v --image ubuntu --command -- sleep infinity
+  leonidas_kube:
+    implemented: True
+detection:
+  sigma_id: a80d927d-ac6e-443f-a867-e8d6e3897318
+  status: experimental
+  level: medium
+  sources: 
+  - name: audit
+    attributes: 
+      apiGroup: ""
+      resource: pods
+      verb: create
+      namespace: kube-system
+references: 
+- https://microsoft.github.io/Threat-Matrix-for-Kubernetes/techniques/Pod%20or%20container%20name%20similarily/
