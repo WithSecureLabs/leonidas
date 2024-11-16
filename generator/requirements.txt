@@ -27,7 +27,7 @@ regex==2020.5.14
 six==1.15.0
 toml==0.10.1
 tornado==6.4.1
-tqdm==4.46.1; python_version > "2.7"
+tqdm==4.66.3; python_version > "2.7"
 typed-ast==1.4.1
 typer==0.2.1
 wrapt==1.12.1
